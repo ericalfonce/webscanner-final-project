@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Create Account{% endblock %}
+
+{% block content %}
+<div class="auth-wrapper">
+  <div class="auth-card auth-card-wide">
+
+    <div class="auth-header">
+      <div class="auth-icon"><i class="bi bi-person-plus-fill"></i></div>
+      <h4 class="fw-bold mb-1">Create your account</h4>
+      <p class="text-muted auth-subtitle mb-0">Join WebScanner — ATC Security Tool</p>
+    </div>
+
+    <div class="auth-body">
+      <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+        {{ form.hidden_tag() }}
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.username.label.text }}</label>
+          {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Choose a username") }}
+          {% for error in form.username.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+          <div class="form-text">3–64 characters, letters and numbers.</div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.email.label.text }}</label>
+          {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="you@example.com") }}
+          {% for error in form.email.errors %}
+            <div class="invalid-feedback">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">{{ form.password.label.text }}</label>
+          <div class="input-group">
+            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="••••••••") }}
+            <button class="btn btn-outline-secondary" type="button"
+                    onclick="togglePassword('password', this)"
+                    aria-label="Toggle password visibility" title="Toggle password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          {% for error in form.password.errors %}
+            <div class="text-danger form-error-sm mt-1">{{ error }}</div>
+          {% endfor %}
+          <div class="form-text">At least 8 characters.</div>
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">{{ form.confirm_password.label.text }}</label>
+          <div class="input-group">
+            {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), id="confirm_password", placeholder="••••••••") }}
+            <button class="btn btn-outline-secondary" type="button"
+                    onclick="togglePassword('confirm_password', this)"
+                    aria-label="Toggle password visibility" title="Toggle password visibility">
+              <i class="bi bi-eye"></i>
+            </button>
+          </div>
+          {% for error in form.confirm_password.errors %}
+            <div class="text-danger form-error-sm mt-1">{{ error }}</div>
+          {% endfor %}
+        </div>
+
+        <div class="d-grid">
+          {{ form.submit(class="btn btn-primary fw-semibold py-2") }}
+        </div>
+      </form>
+    </div>
+
+    <div class="auth-footer">
+      <span class="text-muted">Already have an account?</span>
+      <a href="{{ url_for('auth.login') }}" class="ms-1 fw-semibold text-accent">Sign in</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function togglePassword(fieldId, btn) {
+  const field = document.getElementById(fieldId);
+  const icon  = btn.querySelector('i');
+  if (field.type === 'password') { field.type = 'text'; icon.className = 'bi bi-eye-slash'; }
+  else { field.type = 'password'; icon.className = 'bi bi-eye'; }
+}
+</script>
+{% endblock %}

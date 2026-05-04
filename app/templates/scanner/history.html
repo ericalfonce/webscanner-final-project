@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block title %}Scan History{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div>
+    <h1 class="page-title">Scan History</h1>
+    <p class="page-sub">All vulnerability scans run by your account.</p>
+  </div>
+  <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary fw-semibold">
+    <i class="bi bi-play-circle me-2"></i>New Scan
+  </a>
+</div>
+
+<div class="card border-0">
+  <div class="card-body p-0">
+    {% if scans %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="ps-4">#</th>
+            <th>Target URL</th>
+            <th>Modules</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Findings</th>
+            <th>Started</th>
+            <th>Duration</th>
+            <th class="pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scan in scans %}
+          <tr>
+            <td class="ps-4 text-muted">{{ scan.id }}</td>
+            <td>
+              <span class="text-truncate d-inline-block url-truncate" title="{{ scan.target_url }}">
+                {{ scan.target_url }}
+              </span>
+            </td>
+            <td>
+              {% for m in scan.modules_list %}
+                <span class="badge bg-secondary me-1">{{ m }}</span>
+              {% endfor %}
+            </td>
+            <td><span class="badge bg-dark">{{ scan.scan_type }}</span></td>
+            <td>
+              {% if scan.status == 'completed' %}
+                <span class="badge bg-success"><i class="bi bi-check me-1"></i>Done</span>
+              {% elif scan.status == 'running' %}
+                <span class="badge bg-info"><span class="spinner-border spinner-border-sm me-1"></span>Running</span>
+              {% elif scan.status == 'failed' %}
+                <span class="badge bg-danger" title="{{ scan.error_message }}"><i class="bi bi-x me-1"></i>Failed</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if scan.status == 'completed' %}
+                {% if scan.high_count > 0 %}<span class="badge bg-danger me-1">{{ scan.high_count }} H</span>{% endif %}
+                {% if scan.medium_count > 0 %}<span class="badge bg-orange me-1">{{ scan.medium_count }} M</span>{% endif %}
+                {% if scan.low_count > 0 %}<span class="badge bg-warning me-1">{{ scan.low_count }} L</span>{% endif %}
+                {% if scan.total_findings == 0 %}<span class="text-green tip-text"><i class="bi bi-check-circle me-1"></i>Clean</span>{% endif %}
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-muted tip-text">
+              {{ scan.started_at.strftime('%d %b %Y %H:%M') if scan.started_at else '—' }}
+            </td>
+            <td class="text-muted tip-text">
+              {% if scan.duration_seconds is not none %}{{ scan.duration_seconds }}s{% else %}—{% endif %}
+            </td>
+            <td class="pe-4">
+              <div class="d-flex gap-1 flex-wrap">
+                {% if scan.status == 'completed' %}
+                  <a href="{{ url_for('scanner.scan_results', scan_id=scan.id) }}"
+                     class="btn btn-sm btn-outline-primary" title="View report">
+                    <i class="bi bi-file-earmark-text"></i>
+                  </a>
+                  <a href="{{ url_for('scanner.download_pdf', scan_id=scan.id) }}"
+                     class="btn btn-sm btn-outline-danger" title="Download PDF">
+                    <i class="bi bi-file-pdf"></i>
+                  </a>
+                {% elif scan.status in ('running', 'pending') %}
+                  <a href="{{ url_for('scanner.scan_progress', scan_id=scan.id) }}"
+                     class="btn btn-sm btn-outline-secondary" title="View progress">
+                    <i class="bi bi-eye"></i>
+                  </a>
+                {% endif %}
+                <form method="POST" action="{{ url_for('scanner.delete_scan', scan_id=scan.id) }}"
+                      onsubmit="return confirm('Delete this scan and all its findings?')">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-sm btn-outline-secondary" title="Delete scan">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon"><i class="bi bi-inbox"></i></div>
+      <h6 class="fw-semibold mb-1">No scan history</h6>
+      <p class="text-muted mb-3">Your completed scans will appear here.</p>
+      <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-play-circle me-2"></i>Run first scan
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

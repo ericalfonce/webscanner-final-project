@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="page-header d-flex align-items-center justify-content-between flex-wrap gap-3">
+  <div>
+    <h1 class="page-title">Dashboard</h1>
+    <p class="page-sub">Welcome back, <strong>{{ current_user.username }}</strong></p>
+  </div>
+  <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary fw-semibold">
+    <i class="bi bi-play-circle me-2"></i>Start New Scan
+  </a>
+</div>
+
+<!-- Stats — feature-grid style -->
+<div class="feat-grid feat-grid-4 mb-4">
+  <div class="feat-item">
+    <i class="bi bi-search feat-icon text-blue"></i>
+    <div class="feat-number">{{ stats.total_scans }}</div>
+    <div class="feat-label">Total Scans</div>
+  </div>
+  <div class="feat-item">
+    <i class="bi bi-check-circle feat-icon text-green"></i>
+    <div class="feat-number text-green">{{ stats.completed_scans }}</div>
+    <div class="feat-label">Completed</div>
+  </div>
+  <div class="feat-item">
+    <i class="bi bi-bug feat-icon text-yellow"></i>
+    <div class="feat-number">{{ stats.total_findings }}</div>
+    <div class="feat-label">Total Findings</div>
+  </div>
+  <div class="feat-item">
+    <i class="bi bi-exclamation-triangle feat-icon text-danger"></i>
+    <div class="feat-number text-danger">{{ stats.high_findings }}</div>
+    <div class="feat-label">High Severity</div>
+  </div>
+</div>
+
+<!-- Recent Scans -->
+<div class="card border-0 mb-4">
+  <div class="card-header d-flex align-items-center justify-content-between">
+    <span class="fw-semibold">Recent Scans</span>
+    <a href="{{ url_for('scanner.scan_history') }}" class="btn btn-outline-secondary btn-sm">
+      View all <i class="bi bi-arrow-right ms-1"></i>
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if recent_scans %}
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="ps-4">#</th>
+            <th>Target URL</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Findings</th>
+            <th>Date</th>
+            <th class="pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for scan in recent_scans %}
+          <tr>
+            <td class="ps-4 text-muted">{{ scan.id }}</td>
+            <td>
+              <span class="text-truncate d-inline-block url-truncate" title="{{ scan.target_url }}">
+                {{ scan.target_url }}
+              </span>
+            </td>
+            <td><span class="badge bg-secondary">{{ scan.scan_type }}</span></td>
+            <td>
+              {% if scan.status == 'completed' %}
+                <span class="badge bg-success"><i class="bi bi-check me-1"></i>Completed</span>
+              {% elif scan.status == 'running' %}
+                <span class="badge bg-info"><span class="spinner-border spinner-border-sm me-1"></span>Running</span>
+              {% elif scan.status == 'failed' %}
+                <span class="badge bg-danger"><i class="bi bi-x me-1"></i>Failed</span>
+              {% else %}
+                <span class="badge bg-warning">Pending</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if scan.status == 'completed' %}
+                <span class="badge bg-danger me-1">{{ scan.high_count }} H</span>
+                <span class="badge bg-orange me-1">{{ scan.medium_count }} M</span>
+                <span class="badge bg-warning">{{ scan.low_count }} L</span>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+            <td class="text-muted">{{ scan.started_at.strftime('%d %b %Y %H:%M') if scan.started_at else '—' }}</td>
+            <td class="pe-4">
+              {% if scan.status == 'completed' %}
+                <a href="{{ url_for('scanner.scan_results', scan_id=scan.id) }}" class="btn btn-sm btn-outline-primary">
+                  <i class="bi bi-file-text me-1"></i>Report
+                </a>
+              {% elif scan.status in ('running', 'pending') %}
+                <a href="{{ url_for('scanner.scan_progress', scan_id=scan.id) }}" class="btn btn-sm btn-outline-secondary">
+                  <i class="bi bi-eye me-1"></i>View
+                </a>
+              {% else %}
+                <span class="text-muted">—</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="empty-icon"><i class="bi bi-shield-slash"></i></div>
+      <h6 class="fw-semibold mb-1">No scans yet</h6>
+      <p class="text-muted mb-3">Run your first vulnerability scan to see results here.</p>
+      <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary btn-sm">
+        <i class="bi bi-play-circle me-2"></i>Run first scan
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Capabilities grid -->
+<div class="mb-4">
+  <p class="section-label">Scanner Capabilities</p>
+  <div class="feat-grid">
+    <div class="feat-item">
+      <i class="bi bi-database-x feat-icon text-danger"></i>
+      <div class="feat-title">SQL Injection</div>
+      <p class="feat-desc">Error-based, boolean, and time-based blind injection testing across URL parameters and form inputs.</p>
+    </div>
+    <div class="feat-item">
+      <i class="bi bi-code-slash feat-icon text-orange"></i>
+      <div class="feat-title">XSS Detection</div>
+      <p class="feat-desc">Reflected cross-site scripting detection using 23 curated payloads across all injectable inputs.</p>
+    </div>
+    <div class="feat-item">
+      <i class="bi bi-shield-check feat-icon text-blue"></i>
+      <div class="feat-title">Security Headers</div>
+      <p class="feat-desc">Checks 7 critical HTTP response headers including CSP, HSTS, and X-Frame-Options.</p>
+    </div>
+    <div class="feat-item">
+      <i class="bi bi-diagram-3 feat-icon text-green"></i>
+      <div class="feat-title">Smart Crawler</div>
+      <p class="feat-desc">Recursive link discovery up to 50 pages with form extraction and duplicate URL detection.</p>
+    </div>
+    <div class="feat-item">
+      <i class="bi bi-journal-text feat-icon text-yellow"></i>
+      <div class="feat-title">Detailed Reports</div>
+      <p class="feat-desc">Per-finding evidence, payloads, remediation steps, and educational context for every issue.</p>
+    </div>
+    <div class="feat-item">
+      <i class="bi bi-file-pdf feat-icon text-danger"></i>
+      <div class="feat-title">PDF Export</div>
+      <p class="feat-desc">Export complete scan reports as branded PDFs with severity breakdown and full findings list.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Tip -->
+<div class="tip-card">
+  <div class="d-flex gap-3 align-items-start">
+    <i class="bi bi-lightbulb-fill text-accent fs-5 mt-1 flex-shrink-0"></i>
+    <div>
+      <div class="fw-semibold text-accent mb-1">Educational Use Only</div>
+      <p class="mb-0 text-muted tip-text">
+        Always scan intentionally vulnerable applications like <strong>DVWA</strong> or
+        <strong>OWASP WebGoat</strong>. Never test systems without explicit permission —
+        doing so is illegal in most jurisdictions.
+      </p>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

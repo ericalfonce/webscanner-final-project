@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+{% block title %}Scan Progress{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-9">
+
+    <div class="page-header d-flex align-items-start justify-content-between gap-3">
+      <div>
+        <h1 class="page-title">Scan Progress</h1>
+        <p class="page-sub"><i class="bi bi-globe me-1"></i>{{ scan.target_url }}</p>
+      </div>
+      <span class="badge fs-6
+        {% if scan.status == 'completed' %}bg-success
+        {% elif scan.status == 'failed' %}bg-danger
+        {% elif scan.status == 'running' %}bg-info
+        {% else %}bg-warning{% endif %}" id="statusBadge">
+        {{ scan.status | capitalize }}
+      </span>
+    </div>
+
+    <!-- Counters -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-4">
+        <div class="card border-0 text-center py-3">
+          <div class="stat-number text-blue" id="pagesCount">{{ scan.pages_crawled }}</div>
+          <div class="stat-label">Pages Crawled</div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="card border-0 text-center py-3">
+          <div class="stat-number text-accent" id="testsCount">{{ scan.total_tests }}</div>
+          <div class="stat-label">Tests Run</div>
+        </div>
+      </div>
+      <div class="col-sm-4">
+        <div class="card border-0 text-center py-3">
+          <div class="stat-number text-danger" id="findingsCount">{{ scan.total_findings }}</div>
+          <div class="stat-label">Findings</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="card border-0 mb-4">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <span class="fw-medium" id="progressLabel">
+            {% if scan.status == 'completed' %}Scan Complete
+            {% elif scan.status == 'failed' %}Scan Failed
+            {% elif scan.status == 'running' %}Scan in progress…
+            {% else %}Preparing…{% endif %}
+          </span>
+          <span class="text-muted tip-text" id="progressPct">
+            {% if scan.status in ('completed', 'failed') %}100%{% else %}—{% endif %}
+          </span>
+        </div>
+        <div class="progress progress-sm">
+          <div class="progress-bar
+            {% if scan.status == 'completed' %}bg-success progress-full
+            {% elif scan.status == 'failed' %}bg-danger progress-full
+            {% elif scan.status == 'running' %}progress-bar-striped progress-bar-animated bg-primary progress-run
+            {% else %}bg-secondary progress-init{% endif %}"
+            id="progressBar" role="progressbar"
+            aria-label="Scan progress" title="Scan progress"
+            aria-valuemin="0" aria-valuemax="100">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live Log -->
+    <div class="card border-0 mb-4">
+      <div class="card-header d-flex align-items-center">
+        <i class="bi bi-terminal me-2 text-muted"></i>
+        <span class="fw-semibold">Live Log</span>
+        <div class="spinner-border spinner-border-sm ms-auto text-accent" id="spinner"
+             {% if scan.status not in ('running', 'pending') %}style="display:none"{% endif %}></div>
+      </div>
+      <div class="log-box" id="logBox">
+        <span class="text-muted">Waiting for output…</span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="d-flex gap-2" id="actionButtons">
+      {% if scan.status == 'completed' %}
+      <a href="{{ url_for('scanner.scan_results', scan_id=scan.id) }}" class="btn btn-primary fw-semibold">
+        <i class="bi bi-file-earmark-text me-2"></i>View Report
+      </a>
+      {% endif %}
+      <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-plus-circle me-1"></i>New Scan
+      </a>
+      <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-house me-1"></i>Dashboard
+      </a>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const SCAN_ID    = {{ scan.id }};
+const STATUS_URL = "{{ url_for('scanner.scan_status', scan_id=scan.id) }}";
+let pollInterval = null;
+let lastLogCount = 0;
+
+function updateUI(data) {
+  document.getElementById('pagesCount').textContent    = data.pages_crawled;
+  document.getElementById('testsCount').textContent    = data.total_tests;
+  document.getElementById('findingsCount').textContent = data.findings_count;
+
+  const badge = document.getElementById('statusBadge');
+  badge.textContent = data.status.charAt(0).toUpperCase() + data.status.slice(1);
+  badge.className = 'badge fs-6 ' + ({ completed:'bg-success', failed:'bg-danger', running:'bg-info', pending:'bg-warning' }[data.status] || 'bg-secondary');
+
+  const bar   = document.getElementById('progressBar');
+  const label = document.getElementById('progressLabel');
+  const pct   = document.getElementById('progressPct');
+
+  if (data.status === 'completed') {
+    bar.style.width = '100%';
+    bar.className = 'progress-bar bg-success';
+    label.textContent = 'Scan Complete';
+    pct.textContent = '100%';
+    document.getElementById('spinner').style.display = 'none';
+    setTimeout(() => { window.location.href = `/scanner/results/${SCAN_ID}`; }, 2000);
+    clearInterval(pollInterval);
+  } else if (data.status === 'failed') {
+    bar.style.width = '100%';
+    bar.className = 'progress-bar bg-danger';
+    label.textContent = 'Scan Failed';
+    pct.textContent = '';
+    document.getElementById('spinner').style.display = 'none';
+    clearInterval(pollInterval);
+  } else if (data.status === 'running') {
+    bar.className = 'progress-bar progress-bar-striped progress-bar-animated bg-primary';
+    label.textContent = 'Scan in progress…';
+    const w = parseInt(bar.style.width) || 10;
+    bar.style.width = Math.min(w + 2, 90) + '%';
+  }
+
+  const logBox = document.getElementById('logBox');
+  if (data.logs && data.logs.length > lastLogCount) {
+    if (lastLogCount === 0) logBox.innerHTML = '';
+    data.logs.slice(lastLogCount).forEach(entry => {
+      const div = document.createElement('div');
+      div.className = 'log-' + entry.level;
+      div.textContent = `[${entry.time}] ${entry.message}`;
+      logBox.appendChild(div);
+    });
+    lastLogCount = data.logs.length;
+    logBox.scrollTop = logBox.scrollHeight;
+  }
+}
+
+function poll() {
+  fetch(STATUS_URL).then(r => r.json()).then(updateUI).catch(err => console.error(err));
+}
+
+const initialStatus = "{{ scan.status }}";
+if (initialStatus === 'running' || initialStatus === 'pending') {
+  poll();
+  pollInterval = setInterval(poll, 2000);
+} else {
+  poll();
+}
+</script>
+{% endblock %}

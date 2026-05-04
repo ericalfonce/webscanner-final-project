@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}New Scan{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-lg-8">
+
+    <div class="page-header">
+      <h1 class="page-title">Start a New Scan</h1>
+      <p class="page-sub">Configure and launch a vulnerability scan against a target URL.</p>
+    </div>
+
+    <!-- Disclaimer -->
+    <div class="alert alert-warning d-flex gap-3 mb-4">
+      <i class="bi bi-exclamation-triangle-fill fs-5 flex-shrink-0 mt-1"></i>
+      <div>
+        <div class="fw-semibold mb-1">Ethical Use Required</div>
+        <p class="mb-0 tip-text">
+          Only scan systems you own or have <strong>explicit written permission</strong> to test.
+          Recommended targets: <strong>DVWA</strong>, <strong>OWASP WebGoat</strong>, <strong>HackTheBox</strong>.
+        </p>
+      </div>
+    </div>
+
+    <!-- Form card -->
+    <div class="card border-0">
+      <div class="card-header">
+        <span class="fw-semibold"><i class="bi bi-sliders me-2 text-accent"></i>Scan Configuration</span>
+      </div>
+      <div class="card-body p-4">
+        <form method="POST" action="{{ url_for('scanner.new_scan') }}" id="scanForm">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <!-- Target URL -->
+          <div class="mb-4">
+            <label for="target_url" class="form-label fw-semibold">Target URL</label>
+            <div class="input-group">
+              <span class="input-group-text"><i class="bi bi-link-45deg"></i></span>
+              <input type="url" class="form-control" id="target_url" name="target_url"
+                     placeholder="https://target.example.com"
+                     value="{{ request.form.get('target_url', '') }}" required>
+            </div>
+            <div class="form-text">Include the full URL with http:// or https://. Example: <code>http://localhost/dvwa</code></div>
+          </div>
+
+          <!-- Scan Depth -->
+          <div class="mb-4">
+            <div class="section-label">Scan Depth</div>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="scan-type-card d-block p-3 rounded-3 cursor-pointer" for="quick" id="quickCard">
+                  <div class="d-flex align-items-start gap-2">
+                    <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                           name="scan_type" id="quick" value="quick" checked>
+                    <div>
+                      <div class="fw-semibold mb-1">
+                        <i class="bi bi-lightning-fill me-1 text-yellow"></i>Quick Scan
+                      </div>
+                      <div class="tip-text text-muted">Crawls up to 10 pages. Headers + sample injection tests. ~1–3 min.</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+              <div class="col-md-6">
+                <label class="scan-type-card d-block p-3 rounded-3 cursor-pointer" for="full" id="fullCard">
+                  <div class="d-flex align-items-start gap-2">
+                    <input class="form-check-input mt-1 flex-shrink-0" type="radio"
+                           name="scan_type" id="full" value="full">
+                    <div>
+                      <div class="fw-semibold mb-1">
+                        <i class="bi bi-search me-1 text-blue"></i>Full Scan
+                      </div>
+                      <div class="tip-text text-muted">Crawls up to 50 pages. All injection tests. ~5–15 min.</div>
+                    </div>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Modules -->
+          <div class="mb-4">
+            <div class="section-label">Scan Modules</div>
+            <div class="row g-3">
+              <div class="col-md-4">
+                <div class="module-card p-3 h-100">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="modules" value="sqli" id="modSqli" checked>
+                    <label class="form-check-label fw-semibold" for="modSqli">
+                      <i class="bi bi-database-x me-1 text-danger"></i>SQL Injection
+                    </label>
+                  </div>
+                  <p class="tip-text text-muted mb-2">Tests URL parameters and form inputs using error, boolean, and time-based techniques.</p>
+                  <span class="sev-pill high">High Risk</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="module-card p-3 h-100">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="modules" value="xss" id="modXss" checked>
+                    <label class="form-check-label fw-semibold" for="modXss">
+                      <i class="bi bi-code-slash me-1 text-orange"></i>XSS Detection
+                    </label>
+                  </div>
+                  <p class="tip-text text-muted mb-2">Checks for reflected Cross-Site Scripting by injecting script payloads.</p>
+                  <span class="sev-pill medium">Medium Risk</span>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="module-card p-3 h-100">
+                  <div class="form-check mb-2">
+                    <input class="form-check-input" type="checkbox" name="modules" value="headers" id="modHeaders" checked>
+                    <label class="form-check-label fw-semibold" for="modHeaders">
+                      <i class="bi bi-shield-check me-1 text-blue"></i>Security Headers
+                    </label>
+                  </div>
+                  <p class="tip-text text-muted mb-2">Checks 7 HTTP security headers: CSP, HSTS, X-Frame-Options, and more.</p>
+                  <span class="sev-pill info">Low–Medium</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="d-flex gap-2 pt-2 border-top">
+            <button type="submit" class="btn btn-primary fw-semibold px-4" id="startBtn">
+              <i class="bi bi-play-fill me-2"></i>Start Scan
+            </button>
+            <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.querySelectorAll('input[name="scan_type"]').forEach(radio => {
+  radio.addEventListener('change', function() {
+    document.querySelectorAll('.scan-type-card').forEach(c => c.classList.remove('selected'));
+    this.closest('.scan-type-card').classList.add('selected');
+  });
+});
+document.getElementById('quickCard').classList.add('selected');
+
+document.getElementById('scanForm').addEventListener('submit', function() {
+  const btn = document.getElementById('startBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Starting…';
+});
+</script>
+{% endblock %}
