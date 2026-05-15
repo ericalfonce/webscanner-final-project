@@ -147,17 +147,16 @@ class XSSScanner:
 
     def _payload_reflected(self, payload, response_body):
         """
-        Check if the payload appears unescaped in the response.
-        We look for the raw payload (or key parts of it) in the raw HTML.
-        We exclude cases where it's properly HTML-encoded.
+        Check if what we injected actually came back in the page's HTML.
+        A reflected payload means the server echoed our input back — if that
+        input contains <script> tags, a real user's browser would execute it.
         """
-        # Direct raw reflection — most reliable check
+        # Best case: the exact payload is in the raw HTML — most reliable signal
         if payload in response_body:
-            # Make sure it's not inside a comment or encoded
-            # Use BeautifulSoup to check if it ended up as executable content
             return self._is_executable_context(payload, response_body)
 
-        # Check without quotes (some servers strip quotes but keep the rest)
+        # Some servers strip quotes but keep the rest of the payload intact.
+        # If the stripped version is still recognisable, that still counts.
         stripped = payload.replace('"', '').replace("'", '')
         if len(stripped) > 10 and stripped in response_body:
             return True
@@ -166,22 +165,23 @@ class XSSScanner:
 
     def _is_executable_context(self, payload, response_body):
         """
-        Return True if the reflected payload could be executed.
-        False if it's inside an HTML comment or properly escaped.
+        Not all reflections are dangerous. Here we filter out the safe ones:
+          - Inside an HTML comment (<!-- ... -->) = browser won't run it
+          - HTML entity-encoded (&lt;script&gt;) = browser displays it as text, won't run it
+        If neither safe case applies, we assume it could execute — report it.
         """
-        # Check if it's inside an HTML comment (not executable)
         comment_start = response_body.find('<!--')
         comment_end   = response_body.find('-->')
         payload_pos   = response_body.find(payload)
 
         if (comment_start != -1 and comment_end != -1 and
                 comment_start < payload_pos < comment_end):
-            return False
+            return False  # safely tucked inside a comment
 
-        # Check if HTML entity-encoded version is what appears (safe)
+        # html.escape() turns <script> into &lt;script&gt; — that's the safe encoding
         encoded = html_module.escape(payload)
         if encoded in response_body and payload not in response_body:
-            return False
+            return False  # server encoded it properly — not exploitable
 
         return True
 

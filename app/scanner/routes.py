@@ -70,7 +70,9 @@ def new_scan():
         db.session.add(scan)
         db.session.commit()
 
-        # ---- Launch scan in background thread ----
+        # Scans can take minutes — we run them in a background thread so
+        # the browser isn't just stuck waiting. The page polls for updates every 2s.
+        # daemon=True means the thread dies automatically if the server shuts down.
         thread = threading.Thread(
             target=_run_scan,
             args=(current_app._get_current_object(), scan.id),
@@ -104,6 +106,9 @@ def scan_progress(scan_id):
 def scan_status(scan_id):
     scan = _get_user_scan(scan_id)
 
+    # Grab the 20 most recent log lines for the live progress panel.
+    # We order descending first (to get the latest), then reverse the list
+    # so they display oldest-to-newest in the UI.
     recent_logs = (
         ScanLog.query
         .filter_by(scan_id=scan_id)
@@ -220,12 +225,13 @@ def _run_scan(app, scan_id):
     Execute the full scan pipeline.
     Runs in a separate thread with its own Flask application context.
     """
+    # Background threads don't inherit Flask's app context automatically,
+    # so we push one manually — without this, db calls would crash.
     with app.app_context():
         scan = Scan.query.get(scan_id)
         if not scan:
             return
 
-        # Mark as running
         scan.status     = 'running'
         scan.started_at = datetime.now(timezone.utc)
         db.session.commit()
@@ -238,14 +244,18 @@ def _run_scan(app, scan_id):
             modules = scan.modules_list
 
             # ---- Build shared requests.Session ----
+            # One shared HTTP session for the whole scan — keeps TCP connections
+            # alive between requests which is faster than opening a new one each time.
             session = requests.Session()
             session.headers.update({'User-Agent': config['SCANNER_USER_AGENT']})
-            session.verify = False   # allow self-signed certs on test targets
-            requests.packages.urllib3.disable_warnings()
+            session.verify = False   # skip SSL cert checks so we can scan dev/test sites with self-signed certs
+            requests.packages.urllib3.disable_warnings()  # silence the SSL warning spam that comes with verify=False
 
             # ---- Phase 1: Crawl ----
             _add_log(scan_id, 'info', 'Phase 1/3: Crawling target...')
 
+            # Quick scan = shallow crawl (10 pages, 1 level deep) so it finishes fast.
+            # Full scan = deeper crawl using the limits from config.py.
             max_pages = 10 if scan.scan_type == 'quick' else config['SCAN_MAX_PAGES']
             max_depth = 1  if scan.scan_type == 'quick' else config['SCAN_CRAWL_DEPTH']
 
@@ -311,7 +321,7 @@ def _run_scan(app, scan_id):
                     has_inputs = page.get('params') or page.get('forms')
 
                     if not has_inputs:
-                        continue   # nothing to test
+                        continue   # no forms or URL params = nowhere to inject, skip this page
 
                     _add_log(scan_id, 'info', f'Testing: {page_url}')
 
@@ -329,7 +339,8 @@ def _run_scan(app, scan_id):
                         all_findings.extend(xss_findings)
                         total_tests += 1
 
-            # ---- Deduplicate and save findings ----
+            # Multiple scanners can find the same bug — remove duplicates before saving.
+            # Then sort so the most critical issues appear first in the report.
             unique_findings = deduplicate_findings(all_findings)
             unique_findings = sort_by_severity(unique_findings)
 
@@ -377,7 +388,7 @@ def _add_log(scan_id, level, message):
         db.session.add(log)
         db.session.commit()
     except Exception:
-        pass   # don't let logging errors crash the scan
+        pass   # logging should NEVER crash the actual scan — silently ignore failures here
 
 
 def _get_user_scan(scan_id):

@@ -10,7 +10,9 @@ from flask_wtf.csrf import CSRFProtect
 
 from .config import config
 
-# Extension instances — initialized without an app context yet
+# These are created here but NOT connected to any app yet.
+# We connect them later inside create_app() — this pattern lets us
+# create multiple app instances (e.g. for testing) without conflicts.
 db = SQLAlchemy()
 login_manager = LoginManager()
 csrf = CSRFProtect()
@@ -31,9 +33,9 @@ def create_app(config_name='default'):
     csrf.init_app(app)
 
     login_manager.init_app(app)
-    login_manager.login_view = 'auth.login'
+    login_manager.login_view = 'auth.login'          # where to send users who aren't logged in
     login_manager.login_message = 'Please log in to access this page.'
-    login_manager.login_message_category = 'warning'
+    login_manager.login_message_category = 'warning' # controls the colour of that flash message
 
     # Register blueprints
     from .auth.routes import auth_bp
@@ -47,7 +49,8 @@ def create_app(config_name='default'):
     # Register custom error handlers
     _register_error_handlers(app)
 
-    # Create database tables if they don't exist
+    # Auto-create all database tables on first run.
+    # Safe to call every time — it skips tables that already exist.
     with app.app_context():
         db.create_all()
 

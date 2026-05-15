@@ -48,6 +48,8 @@ class Crawler:
         Start crawling from base_url.
         Returns list of PageInfo dicts with 'url', 'params', 'forms'.
         """
+        # BFS (breadth-first): visit pages level by level, not diving deep into one branch.
+        # This means we discover more of the site before going deeper — better coverage.
         queue = deque()
         queue.append((self.base_url, 0))   # (url, depth)
         self.visited_urls.add(self.base_url)
@@ -62,18 +64,17 @@ class Crawler:
 
             self.pages.append(page_info)
 
-            # Don't recurse beyond max_depth
             if depth >= self.max_depth:
-                continue
+                continue  # we've gone as deep as allowed — don't follow more links from here
 
-            # Enqueue discovered links
+            # Add any new same-domain links to the queue to visit next
             for link in page_info['links']:
                 norm = self._normalize_url(link)
                 if norm and norm not in self.visited_urls and self._in_scope(norm):
                     self.visited_urls.add(norm)
                     queue.append((norm, depth + 1))
 
-            time.sleep(self.delay)
+            time.sleep(self.delay)  # be polite — don't hammer the server with requests
 
         self._log(f"Crawl finished — {len(self.pages)} pages found.")
         return self.pages
@@ -150,7 +151,7 @@ class Crawler:
                         'value': inp.get('value', ''),
                     })
 
-            if inputs:  # only record forms that have testable inputs
+            if inputs:  # skip forms with no injectable fields (e.g. pure file-upload or button-only forms)
                 forms.append({
                     'action': action,
                     'method': method,
@@ -180,7 +181,10 @@ class Crawler:
             return None
 
     def _in_scope(self, url):
-        """Return True only if the URL belongs to the same domain."""
+        """
+        Only follow links that stay on the same domain as the target.
+        This prevents the crawler from accidentally scanning the whole internet.
+        """
         try:
             return urlparse(url).netloc == self.base_domain
         except Exception:

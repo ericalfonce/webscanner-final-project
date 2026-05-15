@@ -12,6 +12,8 @@ from . import db, login_manager
 # User loader — required by Flask-Login
 # ---------------------------------------------------------------------------
 
+# Flask-Login calls this every request to turn the session's user ID
+# back into a real User object so current_user works everywhere.
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -31,7 +33,9 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(256), nullable=False)
     created_at   = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
-    # Relationship to scans
+    # Links to all scans this user has run.
+    # backref='user' means you can do scan.user to get the owner back.
+    # lazy='dynamic' means it returns a query object, not a full list — efficient for large datasets.
     scans = db.relationship('Scan', backref='user', lazy='dynamic')
 
     def __repr__(self):
@@ -56,6 +60,8 @@ class Scan(db.Model):
     error_message = db.Column(db.Text)
 
     # Relationships
+    # cascade='all, delete-orphan' means if you delete a scan,
+    # all its findings and logs get deleted automatically too.
     findings = db.relationship('Finding', backref='scan', lazy='dynamic',
                                cascade='all, delete-orphan')
     logs     = db.relationship('ScanLog', backref='scan', lazy='dynamic',
@@ -67,7 +73,7 @@ class Scan(db.Model):
 
     @property
     def duration_seconds(self):
-        """Return scan duration in seconds, or None if not completed."""
+        """How long the scan took. Returns None if scan hasn't finished yet."""
         if self.started_at and self.completed_at:
             delta = self.completed_at - self.started_at
             return int(delta.total_seconds())

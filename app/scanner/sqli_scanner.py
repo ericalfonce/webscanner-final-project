@@ -16,7 +16,9 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-# Patterns that indicate a database error message in the response
+# When a SQL injection payload breaks the query, the database often leaks
+# its error message into the HTTP response. These are the tell-tale strings
+# we look for — each one is specific to a different database engine.
 DB_ERROR_PATTERNS = [
     "sql syntax",
     "mysql_fetch",
@@ -45,7 +47,8 @@ DB_ERROR_PATTERNS = [
     "sql command not properly ended",
 ]
 
-# Time threshold for time-based detection (seconds)
+# If a response takes longer than this after we inject a SLEEP() payload,
+# the database likely executed our delay command — that confirms SQLi.
 TIME_THRESHOLD = 3.0
 
 
@@ -88,7 +91,7 @@ class SQLiScanner:
                     if finding:
                         new_findings.append(finding)
                         self.findings.append(finding)
-                        break   # one confirmed finding per parameter is enough
+                        break   # found one vuln in this param — no need to keep trying more payloads
                 time.sleep(self.delay)
 
         # Test HTML forms
@@ -178,9 +181,11 @@ class SQLiScanner:
         except requests.exceptions.RequestException:
             return None
 
-        # Significant length difference suggests content changed
+        # If the true condition (OR 1=1) returns a noticeably different page
+        # than the false condition (OR 1=2), the SQL logic is affecting the output
+        # — which means the input is being executed as SQL, not treated as data.
         len_diff = abs(len(r_true.text) - len(r_false.text))
-        if len_diff > 50:
+        if len_diff > 50:  # 50 chars is enough of a difference to be meaningful
             return self._make_finding(
                 url=true_url,
                 parameter=param_name,
@@ -200,7 +205,9 @@ class SQLiScanner:
             self.session.get(injected_url, timeout=self.timeout + TIME_THRESHOLD + 2)
             elapsed = time.time() - start
         except requests.exceptions.Timeout:
-            elapsed = self.timeout + TIME_THRESHOLD + 2  # definitely delayed
+            # A timeout itself is evidence of a delay — the server was sleeping so long
+            # that requests gave up waiting. Treat it as a confirmed time-based hit.
+            elapsed = self.timeout + TIME_THRESHOLD + 2
 
         except requests.exceptions.RequestException:
             return None
