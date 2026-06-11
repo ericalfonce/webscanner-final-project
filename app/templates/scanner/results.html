@@ -139,55 +139,91 @@
     {% endif %}
 
     {% if finding.edu %}
-    <div class="accordion" id="acc_{{ finding.id }}">
-      <div class="accordion-item">
-        <h2 class="accordion-header">
-          <button class="accordion-button collapsed" type="button"
-                  data-bs-toggle="collapse" data-bs-target="#learn_{{ finding.id }}">
-            <i class="bi bi-book-open me-2 text-accent"></i>Learn More About This Vulnerability
-          </button>
-        </h2>
-        <div id="learn_{{ finding.id }}" class="accordion-collapse collapse"
-             data-bs-parent="#acc_{{ finding.id }}">
-          <div class="accordion-body">
-            <div class="row g-3">
-              {% if finding.edu.what %}
-              <div class="col-md-6">
-                <div class="edu-section">
-                  <div class="fw-semibold text-blue mb-2"><i class="bi bi-question-circle me-1"></i>What is it?</div>
-                  <p class="tip-text mb-0">{{ finding.edu.what }}</p>
-                </div>
-              </div>
-              {% endif %}
-              {% if finding.edu.how %}
-              <div class="col-md-6">
-                <div class="edu-section">
-                  <div class="fw-semibold text-yellow mb-2"><i class="bi bi-gear me-1"></i>How does it work?</div>
-                  <p class="tip-text mb-0">{{ finding.edu.how }}</p>
-                </div>
-              </div>
-              {% endif %}
-              {% if finding.edu.why %}
-              <div class="col-md-6">
-                <div class="edu-section">
-                  <div class="fw-semibold text-danger mb-2"><i class="bi bi-exclamation-diamond me-1"></i>Why is it dangerous?</div>
-                  <p class="tip-text mb-0">{{ finding.edu.why }}</p>
-                </div>
-              </div>
-              {% endif %}
-              {% if finding.edu.fix %}
-              <div class="col-md-6">
-                <div class="edu-section">
-                  <div class="fw-semibold text-green mb-2"><i class="bi bi-shield-check me-1"></i>How to prevent it?</div>
-                  <p class="tip-text mb-0 pre-line">{{ finding.edu.fix }}</p>
-                </div>
-              </div>
-              {% endif %}
+    <div class="edu-panel" id="eduPanel_{{ finding.id }}">
+      <button class="edu-toggle" type="button"
+              onclick="toggleEdu('{{ finding.id }}')"
+              id="eduToggle_{{ finding.id }}"
+              aria-expanded="false">
+        <i class="bi bi-book-half me-2"></i>Learn More About This Vulnerability
+        <i class="bi bi-chevron-down ms-auto edu-chevron"></i>
+      </button>
+
+      <div class="edu-body" id="eduBody_{{ finding.id }}" hidden>
+
+        <!-- Tab nav -->
+        <div class="edu-tabs" role="tablist">
+          <button type="button" class="edu-tab active" role="tab" aria-selected="true"
+                  onclick="switchTab('{{ finding.id }}', 'what', this)">What is it?</button>
+          {% if finding.edu.attack_scenario %}
+          <button type="button" class="edu-tab" role="tab" aria-selected="false"
+                  onclick="switchTab('{{ finding.id }}', 'attack', this)">How it's attacked</button>
+          {% endif %}
+          {% if finding.edu.vulnerable_code or finding.edu.safe_code %}
+          <button type="button" class="edu-tab" role="tab" aria-selected="false"
+                  onclick="switchTab('{{ finding.id }}', 'code', this)">Vulnerable vs Safe code</button>
+          {% endif %}
+          {% if finding.edu.real_impact %}
+          <button type="button" class="edu-tab" role="tab" aria-selected="false"
+                  onclick="switchTab('{{ finding.id }}', 'impact', this)">Real-world impact</button>
+          {% endif %}
+          <button type="button" class="edu-tab" role="tab" aria-selected="false"
+                  onclick="switchTab('{{ finding.id }}', 'fix', this)">How to fix</button>
+        </div>
+
+        <!-- Pane: What -->
+        <div class="edu-pane active" id="pane_{{ finding.id }}_what">
+          <p class="edu-text pre-line">{{ finding.edu.what }}</p>
+          {% if finding.edu.cvss %}
+          <div class="edu-meta"><i class="bi bi-speedometer2 me-1"></i><strong>CVSS:</strong> {{ finding.edu.cvss }}</div>
+          {% endif %}
+          {% if finding.edu.owasp %}
+          <div class="edu-meta"><i class="bi bi-box-arrow-up-right me-1"></i>
+            <a href="{{ finding.edu.owasp }}" target="_blank" rel="noopener noreferrer">OWASP Reference →</a>
+          </div>
+          {% endif %}
+        </div>
+
+        <!-- Pane: Attack scenario -->
+        {% if finding.edu.attack_scenario %}
+        <div class="edu-pane" id="pane_{{ finding.id }}_attack" hidden>
+          <pre class="edu-code">{{ finding.edu.attack_scenario }}</pre>
+        </div>
+        {% endif %}
+
+        <!-- Pane: Code comparison -->
+        {% if finding.edu.vulnerable_code or finding.edu.safe_code %}
+        <div class="edu-pane" id="pane_{{ finding.id }}_code" hidden>
+          <div class="row g-3">
+            {% if finding.edu.vulnerable_code %}
+            <div class="col-md-6">
+              <div class="edu-code-label bad"><i class="bi bi-x-circle me-1"></i>Vulnerable code</div>
+              <pre class="edu-code bad">{{ finding.edu.vulnerable_code }}</pre>
             </div>
+            {% endif %}
+            {% if finding.edu.safe_code %}
+            <div class="col-md-6">
+              <div class="edu-code-label good"><i class="bi bi-check-circle me-1"></i>Safe code</div>
+              <pre class="edu-code good">{{ finding.edu.safe_code }}</pre>
+            </div>
+            {% endif %}
           </div>
         </div>
-      </div>
-    </div>
+        {% endif %}
+
+        <!-- Pane: Real impact -->
+        {% if finding.edu.real_impact %}
+        <div class="edu-pane" id="pane_{{ finding.id }}_impact" hidden>
+          <p class="edu-text pre-line">{{ finding.edu.real_impact }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Pane: Fix -->
+        <div class="edu-pane" id="pane_{{ finding.id }}_fix" hidden>
+          <p class="edu-text pre-line">{{ finding.edu.fix }}</p>
+        </div>
+
+      </div><!-- /edu-body -->
+    </div><!-- /edu-panel -->
     {% endif %}
   </div>
 </div>
@@ -203,4 +239,31 @@
   </a>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleEdu(id) {
+  const body    = document.getElementById('eduBody_' + id);
+  const btn     = document.getElementById('eduToggle_' + id);
+  const chevron = btn.querySelector('.edu-chevron');
+  const open    = !body.hidden;
+  body.hidden   = open;
+  btn.setAttribute('aria-expanded', String(!open));
+  chevron.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+function switchTab(findingId, pane, clickedBtn) {
+  const panel = clickedBtn.closest('.edu-tabs');
+  panel.querySelectorAll('.edu-tab').forEach(b => {
+    b.classList.remove('active');
+    b.setAttribute('aria-selected', 'false');
+  });
+  const body = panel.closest('.edu-body');
+  body.querySelectorAll('.edu-pane').forEach(p => { p.hidden = true; });
+  clickedBtn.classList.add('active');
+  clickedBtn.setAttribute('aria-selected', 'true');
+  document.getElementById('pane_' + findingId + '_' + pane).hidden = false;
+}
+</script>
 {% endblock %}

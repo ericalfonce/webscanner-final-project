@@ -309,10 +309,57 @@ class SQLiScanner:
         import json as _json
 
         edu = {
-            'what': 'SQL Injection is a vulnerability where an attacker can insert or "inject" malicious SQL code into a query that an application sends to its database.',
-            'how':  f'By injecting payload like `{payload}` into the parameter `{parameter}`, the application included it directly in a SQL query without proper sanitisation, causing unexpected behaviour.',
-            'why':  'SQL Injection can allow attackers to: read sensitive data from the database, modify or delete data, bypass authentication, execute admin operations on the database, and in some cases take over the server.',
-            'fix':  'Use parameterised queries (prepared statements) instead of string concatenation to build SQL queries. Never trust user input. Use an ORM where possible. Apply input validation and least-privilege database accounts.',
+            'what': (
+                "SQL Injection (SQLi) happens when an application builds a database query by gluing "
+                "user input directly into a SQL string. The database can't tell the difference between "
+                "the developer's intended SQL and the attacker's injected SQL — it just runs whatever it receives.\n\n"
+                "Think of it like a printed form where you write your name, but an attacker writes "
+                "'John; DROP TABLE users;--' instead. If the form is processed literally, the database follows those instructions."
+            ),
+            'attack_scenario': (
+                f"The app likely builds a query similar to:\n"
+                f"  SELECT * FROM table WHERE {parameter} = '[your input]'\n\n"
+                f"We injected: {payload}\n\n"
+                f"Technique used: {technique}\n\n"
+                "What the database actually ran was a broken or manipulated query — "
+                "which either leaked an error message (error-based), returned different data for true/false conditions "
+                "(boolean-based), or paused execution for several seconds (time-based blind)."
+            ),
+            'vulnerable_code': (
+                "# ❌ VULNERABLE — input concatenated directly into SQL string\n"
+                f"query = \"SELECT * FROM users WHERE name='\" + {parameter} + \"'\"\n"
+                "db.execute(query)\n\n"
+                "# Attacker enters:  ' OR '1'='1\n"
+                "# Resulting query:  SELECT * FROM users WHERE name='' OR '1'='1'\n"
+                "# Effect:           Returns ALL users — authentication bypassed completely"
+            ),
+            'safe_code': (
+                "# ✅ SAFE — parameterised query: input is always treated as data, never as SQL\n"
+                f"query = \"SELECT * FROM users WHERE name = ?\"\n"
+                f"db.execute(query, ({parameter},))\n\n"
+                "# ORM approach (SQLAlchemy) — parameterises automatically:\n"
+                f"User.query.filter_by(name={parameter}).first()"
+            ),
+            'real_impact': (
+                "SQL Injection has caused some of the largest data breaches ever recorded:\n\n"
+                "• 2008 — Heartland Payment Systems: 130 million credit card numbers stolen\n"
+                "• 2011 — Sony Pictures: 1 million user accounts and internal data dumped\n"
+                "• 2015 — TalkTalk UK: 157,000 customers' data exposed; £400,000 regulatory fine\n"
+                "• 2017 — Equifax (contributing factor): 147 million people's personal records leaked\n\n"
+                "Impact ranges from reading private data, bypassing login, altering records, "
+                "deleting tables, to full server takeover via xp_cmdshell (SQL Server)."
+            ),
+            'fix': (
+                "1. Parameterised queries / prepared statements — the single most important fix.\n"
+                "   Never concatenate user input into SQL strings.\n\n"
+                "2. Use an ORM (SQLAlchemy, Django ORM, Hibernate) — they parameterise automatically.\n\n"
+                "3. Validate input: check type, length, and allowed character sets before it reaches the DB.\n\n"
+                "4. Least-privilege DB accounts: your app user should have only SELECT/INSERT/UPDATE.\n"
+                "   It should NEVER have DROP, CREATE, or admin privileges.\n\n"
+                "5. Disable detailed DB error messages in production — they reveal schema details to attackers."
+            ),
+            'owasp': 'https://owasp.org/www-community/attacks/SQL_Injection',
+            'cvss':  'CVSS 9.8 Critical — exploitable remotely, no authentication required, full data compromise possible',
         }
 
         self._log(f"[SQLI-HIGH] {technique} found in parameter '{parameter}' at {url}")
