@@ -7,6 +7,7 @@ import io
 import json
 import logging
 from datetime import datetime, timezone
+from html import escape as html_escape
 
 from flask import render_template, current_app
 from .analyzer import summarise, classify_overall_risk
@@ -98,7 +99,7 @@ def generate_pdf_report(scan, findings_list):
         )
         elements.append(Paragraph('Web Vulnerability Scan Report', title_style))
         elements.append(Paragraph(
-            f"Target: {scan.target_url}", styles['Normal']
+            f"Target: {html_escape(scan.target_url)}", styles['Normal']
         ))
         elements.append(Paragraph(
             f"Date: {scan.completed_at.strftime('%Y-%m-%d %H:%M') if scan.completed_at else 'N/A'}",
@@ -155,7 +156,7 @@ def generate_pdf_report(scan, findings_list):
                 color = sev_colors.get(sev, colors.grey)
 
                 elements.append(Paragraph(
-                    f'{idx}. {finding.title}',
+                    f'{idx}. {html_escape(finding.title)}',
                     ParagraphStyle('FTitle', parent=styles['Heading3'],
                                    textColor=color, spaceAfter=2)
                 ))
@@ -181,17 +182,17 @@ def generate_pdf_report(scan, findings_list):
                 if finding.description:
                     elements.append(Spacer(1, 0.15*cm))
                     elements.append(Paragraph(
-                        f'<b>Description:</b> {finding.description}', styles['Normal']
+                        f'<b>Description:</b> {html_escape(finding.description)}', styles['Normal']
                     ))
 
                 if finding.evidence:
                     elements.append(Paragraph(
-                        f'<b>Evidence:</b> {finding.evidence[:300]}', styles['Normal']
+                        f'<b>Evidence:</b> {html_escape(finding.evidence[:300])}', styles['Normal']
                     ))
 
                 if finding.remediation:
                     elements.append(Paragraph(
-                        f'<b>Remediation:</b> {finding.remediation}', styles['Normal']
+                        f'<b>Remediation:</b> {html_escape(finding.remediation)}', styles['Normal']
                     ))
 
                 elements.append(Spacer(1, 0.4*cm))
