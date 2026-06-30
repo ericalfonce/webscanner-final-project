@@ -16,7 +16,7 @@ from . import db, login_manager
 # back into a real User object so current_user works everywhere.
 @login_manager.user_loader
 def load_user(user_id):
-    return User.query.get(int(user_id))
+    return db.session.get(User, int(user_id))
 
 
 # ---------------------------------------------------------------------------

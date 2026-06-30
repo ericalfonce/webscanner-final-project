@@ -228,7 +228,7 @@ def _run_scan(app, scan_id):
     # Background threads don't inherit Flask's app context automatically,
     # so we push one manually — without this, db calls would crash.
     with app.app_context():
-        scan = Scan.query.get(scan_id)
+        scan = db.session.get(Scan, scan_id)
         if not scan:
             return
 
