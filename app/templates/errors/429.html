@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}429 — Too Many Requests{% endblock %}
+{% block content %}
+<div class="text-center py-5">
+  <i class="bi bi-shield-exclamation display-1 text-warning d-block mb-3"></i>
+  <h1 class="display-4 fw-bold">429</h1>
+  <h4 class="text-muted mb-3">Too Many Requests</h4>
+  <p class="text-muted">You have made too many requests in a short time. Please wait before trying again.</p>
+  {% if retry_after %}
+  <p class="text-muted small">Try again in <strong>{{ retry_after }} seconds</strong>.</p>
+  {% endif %}
+  <a href="{{ url_for('auth.login') }}" class="btn btn-accent mt-3">
+    <i class="bi bi-arrow-left me-2"></i>Back to Login
+  </a>
+</div>
+{% endblock %}
