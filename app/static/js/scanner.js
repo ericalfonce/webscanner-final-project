@@ -1,5 +1,5 @@
 /**
- * WebScanner — Client-side JavaScript
+ * WeScan — Client-side JavaScript
  * Handles progress polling, UI interactions, and utility functions.
  */
 

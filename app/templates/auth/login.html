@@ -1,73 +1,542 @@
-{% extends "base.html" %}
-{% block title %}Sign In{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In — WeScan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"
+        integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-{% block content %}
-<div class="auth-wrapper">
-  <div class="auth-card">
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      background: #0a0f1e;
+      -webkit-font-smoothing: antialiased;
+    }
 
-    <div class="auth-header">
-      <div class="auth-icon"><i class="bi bi-shield-lock-fill"></i></div>
-      <h4 class="fw-bold mb-1">Welcome back</h4>
-      <p class="text-muted auth-subtitle mb-0">Sign in to your WebScanner account</p>
+    /* ---- Left panel ---- */
+    .left-panel {
+      flex: 1;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 52px;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0d1b3e 0%, #0a0f1e 60%, #0d2240 100%);
+    }
+
+    /* Animated grid overlay */
+    .left-panel::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(37,99,235,.12) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,.12) 1px, transparent 1px);
+      background-size: 44px 44px;
+      animation: gridShift 20s linear infinite;
+    }
+
+    @keyframes gridShift {
+      0%   { background-position: 0 0; }
+      100% { background-position: 44px 44px; }
+    }
+
+    /* Glow blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: pulse 8s ease-in-out infinite;
+    }
+    .blob-1 {
+      width: 380px; height: 380px;
+      background: #2563eb;
+      top: -100px; left: -80px;
+      animation-delay: 0s;
+    }
+    .blob-2 {
+      width: 260px; height: 260px;
+      background: #7c3aed;
+      bottom: 80px; right: 40px;
+      animation-delay: 3s;
+    }
+    .blob-3 {
+      width: 200px; height: 200px;
+      background: #0ea5e9;
+      top: 50%; left: 50%;
+      transform: translate(-50%,-50%);
+      animation-delay: 6s;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: .18; transform: scale(1); }
+      50%       { opacity: .28; transform: scale(1.08); }
+    }
+    .blob-3 { animation: pulse3 8s ease-in-out infinite; animation-delay: 6s; }
+    @keyframes pulse3 {
+      0%, 100% { opacity: .18; transform: translate(-50%,-50%) scale(1); }
+      50%       { opacity: .28; transform: translate(-50%,-50%) scale(1.08); }
+    }
+
+    /* Brand */
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand-mark {
+      width: 42px; height: 42px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 11px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.2rem;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(37,99,235,.5);
+    }
+
+    .brand-name {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-badge {
+      font-size: 0.58rem;
+      font-weight: 700;
+      background: rgba(37,99,235,.3);
+      color: #93c5fd;
+      border: 1px solid rgba(37,99,235,.4);
+      border-radius: 4px;
+      padding: 2px 6px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    /* Hero text */
+    .hero {
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #60a5fa;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 24px; height: 2px;
+      background: #3b82f6;
+      border-radius: 1px;
+    }
+
+    .hero-title {
+      font-size: 2.6rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 18px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(90deg, #60a5fa, #a78bfa);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 0.95rem;
+      color: #94a3b8;
+      line-height: 1.7;
+      max-width: 380px;
+      margin-bottom: 40px;
+    }
+
+    /* Feature list */
+    .feat-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .feat-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .feat-dot {
+      width: 34px; height: 34px;
+      border-radius: 9px;
+      background: rgba(37,99,235,.2);
+      border: 1px solid rgba(37,99,235,.3);
+      display: flex; align-items: center; justify-content: center;
+      color: #60a5fa;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .feat-text strong {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #e2e8f0;
+      margin-bottom: 2px;
+    }
+
+    .feat-text span {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    /* Bottom tagline */
+    .panel-footer {
+      position: relative;
+      z-index: 2;
+      font-size: 0.78rem;
+      color: #334155;
+      border-top: 1px solid rgba(255,255,255,.06);
+      padding-top: 20px;
+    }
+
+    /* ---- Right panel ---- */
+    .right-panel {
+      width: 480px;
+      flex-shrink: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 52px;
+      position: relative;
+    }
+
+    .form-header {
+      margin-bottom: 36px;
+    }
+
+    .form-header h1 {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.03em;
+      margin-bottom: 6px;
+    }
+
+    .form-header p {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+    .form-label {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 7px;
+      display: block;
+    }
+
+    .form-control {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.9rem;
+      color: #0f172a;
+      background: #fff;
+      transition: border-color .15s, box-shadow .15s;
+      width: 100%;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+    }
+
+    .form-control.is-invalid {
+      border-color: #ef4444;
+    }
+
+    .invalid-feedback {
+      font-size: 0.8rem;
+      color: #ef4444;
+      margin-top: 5px;
+    }
+
+    .input-group { position: relative; }
+    .input-group .form-control { padding-right: 44px; border-radius: 10px; }
+
+    .toggle-pw {
+      position: absolute;
+      right: 0; top: 0; bottom: 0;
+      width: 44px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: #9ca3af;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+      transition: color .15s;
+    }
+    .toggle-pw:hover { color: #374151; }
+
+    .remember-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+    }
+
+    .remember-row input[type="checkbox"] {
+      width: 16px; height: 16px;
+      accent-color: #2563eb;
+      cursor: pointer;
+    }
+
+    .remember-row label {
+      font-size: 0.85rem;
+      color: #6b7280;
+      cursor: pointer;
+      margin: 0;
+    }
+
+    .btn-signin {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 0.9375rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity .15s, transform .1s;
+      letter-spacing: -0.01em;
+      box-shadow: 0 4px 14px rgba(37,99,235,.35);
+    }
+
+    .btn-signin:hover { opacity: .92; transform: translateY(-1px); }
+    .btn-signin:active { transform: translateY(0); }
+
+    .divider {
+      text-align: center;
+      margin: 24px 0;
+      position: relative;
+      font-size: 0.8rem;
+      color: #d1d5db;
+    }
+    .divider::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px;
+      background: #f3f4f6;
+    }
+    .divider span { background: #fff; padding: 0 12px; position: relative; }
+
+    .signup-row {
+      text-align: center;
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .signup-row a {
+      color: #2563eb;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .signup-row a:hover { text-decoration: underline; }
+
+    /* Flash alerts */
+    .flash-box {
+      margin-bottom: 20px;
+    }
+
+    .flash-msg {
+      padding: 10px 14px;
+      border-radius: 9px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .flash-danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
+    .flash-success { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
+    .flash-warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+    .flash-info    { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .left-panel { display: none; }
+      .right-panel { width: 100%; padding: 48px 32px; }
+    }
+
+    @media (max-width: 480px) {
+      .right-panel { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+    <div class="brand">
+      <div class="brand-mark"><i class="bi bi-shield-lock-fill"></i></div>
+      <div>
+        <div class="brand-name">WeScan</div>
+      </div>
+      <div class="brand-badge">EDU</div>
     </div>
 
-    <div class="auth-body">
-      <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
-        {{ form.hidden_tag() }}
-
-        <div class="mb-3">
-          <label for="username" class="form-label">{{ form.username.label.text }}</label>
-          {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", placeholder="Your username") }}
-          {% for error in form.username.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-          {% endfor %}
-        </div>
-
-        <div class="mb-3">
-          <label for="password" class="form-label">{{ form.password.label.text }}</label>
-          <div class="input-group">
-            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="••••••••") }}
-            <button class="btn btn-outline-secondary" type="button"
-                    onclick="togglePassword('password', this)"
-                    aria-label="Toggle password visibility" title="Toggle password visibility">
-              <i class="bi bi-eye"></i>
-            </button>
-            {% for error in form.password.errors %}
-              <div class="invalid-feedback d-block">{{ error }}</div>
-            {% endfor %}
+    <div class="hero">
+      <div class="hero-eyebrow">Web Security Scanner</div>
+      <h2 class="hero-title">Find vulnerabilities<br><span>before attackers do.</span></h2>
+      <p class="hero-desc">
+        WeScan tests your web applications for SQL Injection, XSS, and missing
+        security headers — with detailed reports and remediation guidance.
+      </p>
+      <div class="feat-list">
+        <div class="feat-item">
+          <div class="feat-dot"><i class="bi bi-database-exclamation"></i></div>
+          <div class="feat-text">
+            <strong>SQL Injection</strong>
+            <span>Error-based, boolean-based & time-based blind detection</span>
           </div>
         </div>
-
-        <div class="mb-4">
-          <div class="form-check">
-            {{ form.remember_me(class="form-check-input", id="remember") }}
-            <label class="form-check-label form-check-sm" for="remember">
-              {{ form.remember_me.label.text }}
-            </label>
+        <div class="feat-item">
+          <div class="feat-dot"><i class="bi bi-code-slash"></i></div>
+          <div class="feat-text">
+            <strong>Cross-Site Scripting</strong>
+            <span>Reflected XSS across URL params and form inputs</span>
           </div>
         </div>
-
-        <div class="d-grid">
-          {{ form.submit(class="btn btn-primary fw-semibold py-2") }}
+        <div class="feat-item">
+          <div class="feat-dot"><i class="bi bi-file-earmark-lock"></i></div>
+          <div class="feat-text">
+            <strong>Security Headers</strong>
+            <span>CSP, HSTS, X-Frame-Options and 4 more</span>
+          </div>
         </div>
-      </form>
+        <div class="feat-item">
+          <div class="feat-dot"><i class="bi bi-file-earmark-pdf"></i></div>
+          <div class="feat-text">
+            <strong>PDF Reports</strong>
+            <span>Branded, shareable scan reports with severity breakdown</span>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <div class="auth-footer">
-      <span class="text-muted">Don't have an account?</span>
-      <a href="{{ url_for('auth.register') }}" class="ms-1 fw-semibold text-accent">Create one</a>
+    <div class="panel-footer">
+      Educational use only — scan only authorised systems &nbsp;·&nbsp; ATC Diploma ICT 2026
     </div>
   </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-function togglePassword(fieldId, btn) {
-  const field = document.getElementById(fieldId);
-  const icon  = btn.querySelector('i');
-  if (field.type === 'password') { field.type = 'text'; icon.className = 'bi bi-eye-slash'; }
-  else { field.type = 'password'; icon.className = 'bi bi-eye'; }
-}
-</script>
-{% endblock %}
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-box">
+        {% for category, message in messages %}
+        <div class="flash-msg flash-{{ category }}">
+          <i class="bi bi-{% if category == 'danger' %}exclamation-triangle-fill{% elif category == 'success' %}check-circle-fill{% elif category == 'warning' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+          {{ message }}
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="form-header">
+      <h1>Welcome back</h1>
+      <p>Sign in to your WeScan account to continue</p>
+    </div>
+
+    <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="mb-4">
+        <label class="form-label" for="username">Username</label>
+        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", placeholder="Enter your username") }}
+        {% for error in form.username.errors %}
+          <div class="invalid-feedback">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="mb-4">
+        <label class="form-label" for="password">Password</label>
+        <div class="input-group">
+          {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="••••••••") }}
+          <button class="toggle-pw" type="button" onclick="togglePw()" aria-label="Toggle password" title="Toggle password">
+            <i class="bi bi-eye" id="pw-icon"></i>
+          </button>
+        </div>
+        {% for error in form.password.errors %}
+          <div class="invalid-feedback d-block">{{ error }}</div>
+        {% endfor %}
+      </div>
+
+      <div class="remember-row">
+        {{ form.remember_me(id="remember") }}
+        <label for="remember">Keep me signed in for 7 days</label>
+      </div>
+
+      <button type="submit" class="btn-signin">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Sign in
+      </button>
+    </form>
+
+    <div class="divider"><span>or</span></div>
+
+    <div class="signup-row">
+      Don't have an account? <a href="{{ url_for('auth.register') }}">Create one free</a>
+    </div>
+
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+  <script>
+    function togglePw() {
+      const f = document.getElementById('password');
+      const i = document.getElementById('pw-icon');
+      if (f.type === 'password') { f.type = 'text'; i.className = 'bi bi-eye-slash'; }
+      else { f.type = 'password'; i.className = 'bi bi-eye'; }
+    }
+  </script>
+</body>
+</html>
