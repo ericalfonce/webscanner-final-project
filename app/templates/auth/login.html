@@ -4,538 +4,612 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sign In — WeScan</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"
         integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --dark:      #0b0e17;
+      --dark-2:    #111520;
+      --dark-3:    #161b2e;
+      --border:    rgba(255,255,255,.07);
+      --text-dim:  #4a5268;
+      --text-mid:  #8892a4;
+      --text-light:#c9d1e0;
+      --text-white:#f0f2f7;
+      --blue:      #3b82f6;
+      --blue-dim:  rgba(59,130,246,.12);
+      --blue-glow: rgba(59,130,246,.25);
+    }
 
     body {
       font-family: 'Inter', system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
-      background: #0a0f1e;
+      background: var(--dark);
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ---- Left panel ---- */
-    .left-panel {
+    /* ================================================================
+       LEFT PANEL
+    ================================================================ */
+    .left {
       flex: 1;
-      position: relative;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
-      padding: 48px 52px;
+      padding: 44px 56px;
+      background: var(--dark);
+      position: relative;
       overflow: hidden;
-      background: linear-gradient(135deg, #0d1b3e 0%, #0a0f1e 60%, #0d2240 100%);
+      border-right: 1px solid var(--border);
     }
 
-    /* Animated grid overlay */
-    .left-panel::before {
+    /* Dot grid */
+    .left::before {
       content: '';
       position: absolute;
       inset: 0;
-      background-image:
-        linear-gradient(rgba(37,99,235,.12) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(37,99,235,.12) 1px, transparent 1px);
-      background-size: 44px 44px;
-      animation: gridShift 20s linear infinite;
+      background-image: radial-gradient(circle, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
     }
 
-    @keyframes gridShift {
-      0%   { background-position: 0 0; }
-      100% { background-position: 44px 44px; }
-    }
-
-    /* Glow blobs */
-    .blob {
+    /* Subtle blue wash bottom-right */
+    .left::after {
+      content: '';
       position: absolute;
-      border-radius: 50%;
-      filter: blur(80px);
-      opacity: 0.18;
-      animation: pulse 8s ease-in-out infinite;
-    }
-    .blob-1 {
-      width: 380px; height: 380px;
-      background: #2563eb;
-      top: -100px; left: -80px;
-      animation-delay: 0s;
-    }
-    .blob-2 {
-      width: 260px; height: 260px;
-      background: #7c3aed;
-      bottom: 80px; right: 40px;
-      animation-delay: 3s;
-    }
-    .blob-3 {
-      width: 200px; height: 200px;
-      background: #0ea5e9;
-      top: 50%; left: 50%;
-      transform: translate(-50%,-50%);
-      animation-delay: 6s;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: .18; transform: scale(1); }
-      50%       { opacity: .28; transform: scale(1.08); }
-    }
-    .blob-3 { animation: pulse3 8s ease-in-out infinite; animation-delay: 6s; }
-    @keyframes pulse3 {
-      0%, 100% { opacity: .18; transform: translate(-50%,-50%) scale(1); }
-      50%       { opacity: .28; transform: translate(-50%,-50%) scale(1.08); }
+      bottom: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(59,130,246,.07) 0%, transparent 70%);
+      pointer-events: none;
     }
 
     /* Brand */
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       position: relative;
       z-index: 2;
     }
 
-    .brand-mark {
-      width: 42px; height: 42px;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      border-radius: 11px;
+    .brand-icon {
+      width: 34px; height: 34px;
+      background: var(--blue);
+      border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.2rem;
       color: #fff;
-      box-shadow: 0 0 20px rgba(37,99,235,.5);
+      font-size: 0.95rem;
     }
 
     .brand-name {
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #fff;
-      letter-spacing: -0.02em;
-    }
-
-    .brand-badge {
-      font-size: 0.58rem;
+      font-size: 1.05rem;
       font-weight: 700;
-      background: rgba(37,99,235,.3);
-      color: #93c5fd;
-      border: 1px solid rgba(37,99,235,.4);
-      border-radius: 4px;
-      padding: 2px 6px;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
+      color: var(--text-white);
+      letter-spacing: -0.01em;
     }
 
-    /* Hero text */
+    .brand-pill {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--blue);
+      background: var(--blue-dim);
+      border: 1px solid rgba(59,130,246,.25);
+      border-radius: 4px;
+      padding: 2px 7px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Hero */
     .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 440px;
       position: relative;
       z-index: 2;
     }
 
-    .hero-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #60a5fa;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      display: flex;
+    .hero-tag {
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--blue);
+      margin-bottom: 22px;
+      letter-spacing: 0.02em;
     }
 
-    .hero-eyebrow::before {
+    .hero-tag::before {
       content: '';
       display: block;
-      width: 24px; height: 2px;
-      background: #3b82f6;
-      border-radius: 1px;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 6px var(--blue);
     }
 
     .hero-title {
-      font-size: 2.6rem;
+      font-size: 2.75rem;
       font-weight: 800;
-      color: #fff;
-      line-height: 1.1;
-      letter-spacing: -0.03em;
-      margin-bottom: 18px;
+      color: var(--text-white);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      margin-bottom: 20px;
     }
 
-    .hero-title span {
-      background: linear-gradient(90deg, #60a5fa, #a78bfa);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    .hero-title em {
+      font-style: normal;
+      color: var(--blue);
     }
 
     .hero-desc {
-      font-size: 0.95rem;
-      color: #94a3b8;
-      line-height: 1.7;
-      max-width: 380px;
+      font-size: 0.925rem;
+      color: var(--text-mid);
+      line-height: 1.75;
+      margin-bottom: 48px;
+    }
+
+    /* Stats row */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
       margin-bottom: 40px;
     }
 
-    /* Feature list */
-    .feat-list {
+    .stat {
+      background: var(--dark-2);
+      padding: 18px 20px;
+      transition: background .2s;
+    }
+
+    .stat:hover { background: var(--dark-3); }
+
+    .stat-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--text-white);
+      letter-spacing: -0.04em;
+      line-height: 1;
+      margin-bottom: 5px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .stat-lbl {
+      font-size: 0.73rem;
+      color: var(--text-dim);
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* Module list */
+    .modules {
       display: flex;
       flex-direction: column;
-      gap: 14px;
+      gap: 10px;
     }
 
-    .feat-item {
+    .module {
       display: flex;
-      align-items: flex-start;
-      gap: 14px;
-    }
-
-    .feat-dot {
-      width: 34px; height: 34px;
+      align-items: center;
+      gap: 12px;
+      padding: 13px 16px;
+      background: var(--dark-2);
+      border: 1px solid var(--border);
       border-radius: 9px;
-      background: rgba(37,99,235,.2);
-      border: 1px solid rgba(37,99,235,.3);
+      transition: border-color .2s, background .2s;
+    }
+
+    .module:hover {
+      border-color: rgba(59,130,246,.3);
+      background: var(--dark-3);
+    }
+
+    .module-icon {
+      font-size: 0.85rem;
+      color: var(--blue);
+      width: 28px; height: 28px;
+      background: var(--blue-dim);
+      border-radius: 6px;
       display: flex; align-items: center; justify-content: center;
-      color: #60a5fa;
-      font-size: 0.9rem;
       flex-shrink: 0;
-      margin-top: 1px;
     }
 
-    .feat-text strong {
-      display: block;
-      font-size: 0.875rem;
+    .module-name {
+      font-size: 0.85rem;
       font-weight: 600;
-      color: #e2e8f0;
-      margin-bottom: 2px;
+      color: var(--text-light);
     }
 
-    .feat-text span {
-      font-size: 0.8rem;
-      color: #64748b;
+    .module-desc {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      margin-left: auto;
+      text-align: right;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
     }
 
-    /* Bottom tagline */
-    .panel-footer {
+    /* Panel footer */
+    .left-foot {
       position: relative;
       z-index: 2;
-      font-size: 0.78rem;
-      color: #334155;
-      border-top: 1px solid rgba(255,255,255,.06);
-      padding-top: 20px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    /* ---- Right panel ---- */
-    .right-panel {
-      width: 480px;
+    /* ================================================================
+       RIGHT PANEL
+    ================================================================ */
+    .right {
+      width: 460px;
       flex-shrink: 0;
       background: #fff;
       display: flex;
       flex-direction: column;
       justify-content: center;
       padding: 60px 52px;
-      position: relative;
     }
 
-    .form-header {
-      margin-bottom: 36px;
+    .form-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #9ca3af;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
     }
 
-    .form-header h1 {
-      font-size: 1.75rem;
+    .form-title {
+      font-size: 1.65rem;
       font-weight: 800;
       color: #0f172a;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
       margin-bottom: 6px;
     }
 
-    .form-header p {
-      font-size: 0.9rem;
-      color: #64748b;
+    .form-sub {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 36px;
     }
 
-    .form-label {
+    /* Flash */
+    .flash { margin-bottom: 20px; }
+
+    .flash-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      margin-bottom: 8px;
+    }
+
+    .flash-item.danger  { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .flash-item.success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .flash-item.warning { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .flash-item.info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+    /* Field */
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: block;
       font-size: 0.8125rem;
       font-weight: 600;
       color: #374151;
       margin-bottom: 7px;
-      display: block;
     }
 
-    .form-control {
-      border: 1.5px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 10px 14px;
-      font-size: 0.9rem;
-      color: #0f172a;
-      background: #fff;
-      transition: border-color .15s, box-shadow .15s;
+    .field input {
       width: 100%;
-    }
-
-    .form-control:focus {
+      padding: 10px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #111827;
+      font-family: 'Inter', sans-serif;
+      background: #fafafa;
+      transition: border-color .15s, box-shadow .15s, background .15s;
       outline: none;
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.12);
     }
 
-    .form-control.is-invalid {
-      border-color: #ef4444;
+    .field input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+      background: #fff;
     }
 
-    .invalid-feedback {
-      font-size: 0.8rem;
+    .field input.err { border-color: #ef4444; }
+
+    .field-err {
+      font-size: 0.78rem;
       color: #ef4444;
       margin-top: 5px;
     }
 
-    .input-group { position: relative; }
-    .input-group .form-control { padding-right: 44px; border-radius: 10px; }
+    /* Password wrapper */
+    .pw-wrap { position: relative; }
 
-    .toggle-pw {
+    .pw-wrap input { padding-right: 42px; }
+
+    .pw-toggle {
       position: absolute;
-      right: 0; top: 0; bottom: 0;
-      width: 44px;
+      right: 1px; top: 1px; bottom: 1px;
+      width: 40px;
       background: transparent;
       border: none;
+      border-radius: 0 7px 7px 0;
       cursor: pointer;
       color: #9ca3af;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1rem;
+      font-size: 0.95rem;
       transition: color .15s;
     }
-    .toggle-pw:hover { color: #374151; }
+    .pw-toggle:hover { color: #374151; }
 
-    .remember-row {
+    /* Remember */
+    .remember {
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 9px;
       margin-bottom: 28px;
     }
 
-    .remember-row input[type="checkbox"] {
-      width: 16px; height: 16px;
-      accent-color: #2563eb;
+    .remember input[type="checkbox"] {
+      width: 15px; height: 15px;
+      accent-color: #3b82f6;
       cursor: pointer;
+      flex-shrink: 0;
     }
 
-    .remember-row label {
-      font-size: 0.85rem;
+    .remember label {
+      font-size: 0.84rem;
       color: #6b7280;
       cursor: pointer;
-      margin: 0;
     }
 
-    .btn-signin {
+    /* Submit */
+    .btn-submit {
       width: 100%;
-      padding: 12px;
-      background: linear-gradient(135deg, #2563eb, #1d4ed8);
+      padding: 11px;
+      background: #0f172a;
       color: #fff;
       border: none;
-      border-radius: 10px;
-      font-size: 0.9375rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
       font-weight: 600;
+      font-family: 'Inter', sans-serif;
       cursor: pointer;
-      transition: opacity .15s, transform .1s;
       letter-spacing: -0.01em;
-      box-shadow: 0 4px 14px rgba(37,99,235,.35);
+      transition: background .15s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 24px;
     }
 
-    .btn-signin:hover { opacity: .92; transform: translateY(-1px); }
-    .btn-signin:active { transform: translateY(0); }
+    .btn-submit:hover { background: #1e293b; }
+    .btn-submit:active { transform: scale(.99); }
 
-    .divider {
-      text-align: center;
-      margin: 24px 0;
-      position: relative;
-      font-size: 0.8rem;
+    /* Divider */
+    .sep {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.78rem;
       color: #d1d5db;
+      margin-bottom: 20px;
     }
-    .divider::before {
-      content: '';
-      position: absolute;
-      top: 50%; left: 0; right: 0;
-      height: 1px;
-      background: #f3f4f6;
-    }
-    .divider span { background: #fff; padding: 0 12px; position: relative; }
+    .sep::before, .sep::after { content: ''; flex: 1; height: 1px; background: #f3f4f6; }
 
-    .signup-row {
+    /* Register link */
+    .reg-link {
       text-align: center;
       font-size: 0.875rem;
-      color: #6b7280;
+      color: #9ca3af;
     }
 
-    .signup-row a {
-      color: #2563eb;
+    .reg-link a {
+      color: #3b82f6;
       font-weight: 600;
       text-decoration: none;
     }
-    .signup-row a:hover { text-decoration: underline; }
 
-    /* Flash alerts */
-    .flash-box {
-      margin-bottom: 20px;
+    .reg-link a:hover { text-decoration: underline; }
+
+    /* Right footer */
+    .right-foot {
+      position: absolute;
+      bottom: 28px;
+      left: 52px; right: 52px;
+      font-size: 0.73rem;
+      color: #d1d5db;
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    .flash-msg {
-      padding: 10px 14px;
-      border-radius: 9px;
-      font-size: 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 8px;
+    /* ================================================================
+       RESPONSIVE
+    ================================================================ */
+    @media (max-width: 960px) {
+      .left { display: none; }
+      .right { width: 100%; padding: 48px 36px; }
     }
-
-    .flash-danger  { background: #fef2f2; color: #991b1b; border: 1px solid #fca5a5; }
-    .flash-success { background: #f0fdf4; color: #14532d; border: 1px solid #86efac; }
-    .flash-warning { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
-    .flash-info    { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
-
-    /* Responsive */
-    @media (max-width: 900px) {
-      .left-panel { display: none; }
-      .right-panel { width: 100%; padding: 48px 32px; }
-    }
-
     @media (max-width: 480px) {
-      .right-panel { padding: 36px 24px; }
+      .right { padding: 36px 24px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- LEFT PANEL -->
-  <div class="left-panel">
-    <div class="blob blob-1"></div>
-    <div class="blob blob-2"></div>
-    <div class="blob blob-3"></div>
+  <!-- LEFT -->
+  <div class="left">
 
     <div class="brand">
-      <div class="brand-mark"><i class="bi bi-shield-lock-fill"></i></div>
-      <div>
-        <div class="brand-name">WeScan</div>
-      </div>
-      <div class="brand-badge">EDU</div>
+      <div class="brand-icon"><i class="bi bi-shield-lock-fill"></i></div>
+      <span class="brand-name">WeScan</span>
+      <span class="brand-pill">v1.0 · edu</span>
     </div>
 
     <div class="hero">
-      <div class="hero-eyebrow">Web Security Scanner</div>
-      <h2 class="hero-title">Find vulnerabilities<br><span>before attackers do.</span></h2>
+
+      <div class="hero-tag">Web Security Scanner</div>
+
+      <h1 class="hero-title">
+        Detect. Analyse.<br><em>Remediate.</em>
+      </h1>
+
       <p class="hero-desc">
-        WeScan tests your web applications for SQL Injection, XSS, and missing
-        security headers — with detailed reports and remediation guidance.
+        WeScan crawls your web application and tests for SQLi, XSS, and
+        missing security headers — producing structured reports with
+        payload evidence and remediation steps.
       </p>
-      <div class="feat-list">
-        <div class="feat-item">
-          <div class="feat-dot"><i class="bi bi-database-exclamation"></i></div>
-          <div class="feat-text">
-            <strong>SQL Injection</strong>
-            <span>Error-based, boolean-based & time-based blind detection</span>
-          </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-num">24</div>
+          <div class="stat-lbl">SQLi payloads</div>
         </div>
-        <div class="feat-item">
-          <div class="feat-dot"><i class="bi bi-code-slash"></i></div>
-          <div class="feat-text">
-            <strong>Cross-Site Scripting</strong>
-            <span>Reflected XSS across URL params and form inputs</span>
-          </div>
+        <div class="stat">
+          <div class="stat-num">23</div>
+          <div class="stat-lbl">XSS payloads</div>
         </div>
-        <div class="feat-item">
-          <div class="feat-dot"><i class="bi bi-file-earmark-lock"></i></div>
-          <div class="feat-text">
-            <strong>Security Headers</strong>
-            <span>CSP, HSTS, X-Frame-Options and 4 more</span>
-          </div>
-        </div>
-        <div class="feat-item">
-          <div class="feat-dot"><i class="bi bi-file-earmark-pdf"></i></div>
-          <div class="feat-text">
-            <strong>PDF Reports</strong>
-            <span>Branded, shareable scan reports with severity breakdown</span>
-          </div>
+        <div class="stat">
+          <div class="stat-num">7</div>
+          <div class="stat-lbl">Header checks</div>
         </div>
       </div>
+
+      <div class="modules">
+        <div class="module">
+          <div class="module-icon"><i class="bi bi-database-exclamation"></i></div>
+          <div>
+            <div class="module-name">SQL Injection</div>
+          </div>
+          <div class="module-desc">error · boolean · time-based</div>
+        </div>
+        <div class="module">
+          <div class="module-icon"><i class="bi bi-code-slash"></i></div>
+          <div>
+            <div class="module-name">Cross-Site Scripting</div>
+          </div>
+          <div class="module-desc">reflected XSS</div>
+        </div>
+        <div class="module">
+          <div class="module-icon"><i class="bi bi-shield-check"></i></div>
+          <div>
+            <div class="module-name">Security Headers</div>
+          </div>
+          <div class="module-desc">CSP · HSTS · X-Frame</div>
+        </div>
+        <div class="module">
+          <div class="module-icon"><i class="bi bi-file-earmark-pdf"></i></div>
+          <div>
+            <div class="module-name">PDF Report Export</div>
+          </div>
+          <div class="module-desc">severity breakdown</div>
+        </div>
+      </div>
+
     </div>
 
-    <div class="panel-footer">
-      Educational use only — scan only authorised systems &nbsp;·&nbsp; ATC Diploma ICT 2026
+    <div class="left-foot">
+      &copy; 2026 WeScan &nbsp;·&nbsp; Arusha Technical College &nbsp;·&nbsp; Scan only authorised targets
     </div>
+
   </div>
 
-  <!-- RIGHT PANEL -->
-  <div class="right-panel">
+  <!-- RIGHT -->
+  <div class="right" style="position:relative;">
 
-    <!-- Flash messages -->
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% if messages %}
-      <div class="flash-box">
+      <div class="flash">
         {% for category, message in messages %}
-        <div class="flash-msg flash-{{ category }}">
+        <div class="flash-item {{ category }}">
           <i class="bi bi-{% if category == 'danger' %}exclamation-triangle-fill{% elif category == 'success' %}check-circle-fill{% elif category == 'warning' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}"></i>
-          {{ message }}
+          <span>{{ message }}</span>
         </div>
         {% endfor %}
       </div>
       {% endif %}
     {% endwith %}
 
-    <div class="form-header">
-      <h1>Welcome back</h1>
-      <p>Sign in to your WeScan account to continue</p>
-    </div>
+    <div class="form-eyebrow">Secure access</div>
+    <div class="form-title">Sign in</div>
+    <div class="form-sub">Enter your credentials to access WeScan</div>
 
     <form method="POST" action="{{ url_for('auth.login') }}" novalidate>
       {{ form.hidden_tag() }}
 
-      <div class="mb-4">
-        <label class="form-label" for="username">Username</label>
-        {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), id="username", placeholder="Enter your username") }}
-        {% for error in form.username.errors %}
-          <div class="invalid-feedback">{{ error }}</div>
-        {% endfor %}
+      <div class="field">
+        <label for="username">Username</label>
+        {{ form.username(id="username", placeholder="your_username", **{"class": "err" if form.username.errors else ""}) }}
+        {% for e in form.username.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
       </div>
 
-      <div class="mb-4">
-        <label class="form-label" for="password">Password</label>
-        <div class="input-group">
-          {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="••••••••") }}
-          <button class="toggle-pw" type="button" onclick="togglePw()" aria-label="Toggle password" title="Toggle password">
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw-wrap">
+          {{ form.password(id="password", placeholder="••••••••", **{"class": "err" if form.password.errors else ""}) }}
+          <button class="pw-toggle" type="button" onclick="togglePw()" aria-label="Toggle password">
             <i class="bi bi-eye" id="pw-icon"></i>
           </button>
         </div>
-        {% for error in form.password.errors %}
-          <div class="invalid-feedback d-block">{{ error }}</div>
-        {% endfor %}
+        {% for e in form.password.errors %}<div class="field-err d-block" style="display:block">{{ e }}</div>{% endfor %}
       </div>
 
-      <div class="remember-row">
+      <div class="remember">
         {{ form.remember_me(id="remember") }}
-        <label for="remember">Keep me signed in for 7 days</label>
+        <label for="remember">Stay signed in for 7 days</label>
       </div>
 
-      <button type="submit" class="btn-signin">
-        <i class="bi bi-box-arrow-in-right me-2"></i>Sign in
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-box-arrow-in-right"></i> Sign in to WeScan
       </button>
     </form>
 
-    <div class="divider"><span>or</span></div>
+    <div class="sep">or</div>
 
-    <div class="signup-row">
-      Don't have an account? <a href="{{ url_for('auth.register') }}">Create one free</a>
+    <div class="reg-link">
+      No account? <a href="{{ url_for('auth.register') }}">Create one — it's free</a>
+    </div>
+
+    <div class="right-foot">
+      ATC Diploma in ICT · 2026
     </div>
 
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
-          integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
   <script>
     function togglePw() {
       const f = document.getElementById('password');
       const i = document.getElementById('pw-icon');
-      if (f.type === 'password') { f.type = 'text'; i.className = 'bi bi-eye-slash'; }
-      else { f.type = 'password'; i.className = 'bi bi-eye'; }
+      f.type = f.type === 'password' ? 'text' : 'password';
+      i.className = f.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
     }
   </script>
 </body>
