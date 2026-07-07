@@ -1,89 +1,512 @@
-{% extends "base.html" %}
-{% block title %}Create Account{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account — WeScan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"
+        integrity="sha384-XGjxtQfXaH2tnPFa9x+ruJTuLE3Aa6LhHSWRr1XeTyhezb4abCG4ccI5AkVDxqC+" crossorigin="anonymous">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-{% block content %}
-<div class="auth-wrapper">
-  <div class="auth-card auth-card-wide">
+    :root {
+      --dark:      #0b0e17;
+      --dark-2:    #111520;
+      --dark-3:    #161b2e;
+      --border:    rgba(255,255,255,.07);
+      --text-dim:  #4a5268;
+      --text-mid:  #8892a4;
+      --text-light:#c9d1e0;
+      --text-white:#f0f2f7;
+      --blue:      #3b82f6;
+      --blue-dim:  rgba(59,130,246,.12);
+    }
 
-    <div class="auth-header">
-      <div class="auth-icon"><i class="bi bi-person-plus-fill"></i></div>
-      <h4 class="fw-bold mb-1">Create your account</h4>
-      <p class="text-muted auth-subtitle mb-0">Join WeScan — ATC Security Tool</p>
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      height: 100vh;
+      display: flex;
+      background: var(--dark);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ================================================================
+       LEFT PANEL — identical to login
+    ================================================================ */
+    .left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: clamp(24px, 4vh, 44px) clamp(28px, 4vw, 56px);
+      background: var(--dark);
+      position: relative;
+      overflow: hidden;
+      border-right: 1px solid var(--border);
+      min-height: 0;
+    }
+
+    .left::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(255,255,255,.04) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    .left::after {
+      content: '';
+      position: absolute;
+      bottom: -120px; right: -120px;
+      width: 480px; height: 480px;
+      background: radial-gradient(circle, rgba(59,130,246,.07) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .brand-name {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-white);
+      letter-spacing: -0.01em;
+    }
+
+    .brand-pill {
+      font-size: 0.6rem;
+      font-weight: 600;
+      color: var(--blue);
+      background: var(--blue-dim);
+      border: 1px solid rgba(59,130,246,.25);
+      border-radius: 4px;
+      padding: 2px 7px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hero {
+      flex: 1;
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      max-width: 440px;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--blue);
+      margin-bottom: clamp(10px, 2vh, 22px);
+      letter-spacing: 0.02em;
+    }
+
+    .hero-tag::before {
+      content: '';
+      display: block;
+      width: 3px; height: 3px;
+      border-radius: 50%;
+      background: var(--blue);
+      box-shadow: 0 0 6px var(--blue);
+    }
+
+    .hero-title {
+      font-size: clamp(1.6rem, 3.5vh, 2.75rem);
+      font-weight: 800;
+      color: var(--text-white);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+      margin-bottom: clamp(10px, 2vh, 20px);
+    }
+
+    .hero-title em { font-style: normal; color: var(--blue); }
+
+    .hero-desc {
+      font-size: clamp(0.8rem, 1.4vh, 0.925rem);
+      color: var(--text-mid);
+      line-height: 1.65;
+      margin-bottom: clamp(20px, 4vh, 48px);
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: clamp(8px, 1.5vh, 14px);
+      flex-shrink: 0;
+    }
+
+    .step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: clamp(10px, 1.8vh, 16px) 16px;
+      background: var(--dark-2);
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      transition: border-color .2s, background .2s;
+    }
+
+    .step:hover {
+      border-color: rgba(59,130,246,.3);
+      background: var(--dark-3);
+    }
+
+    .step-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--blue);
+      background: var(--blue-dim);
+      border: 1px solid rgba(59,130,246,.25);
+      border-radius: 5px;
+      width: 26px; height: 26px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-text strong {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-light);
+      margin-bottom: 2px;
+    }
+
+    .step-text span {
+      font-size: 0.76rem;
+      color: var(--text-dim);
+    }
+
+    /* ================================================================
+       RIGHT PANEL — identical to login
+    ================================================================ */
+    .right {
+      width: clamp(340px, 38vw, 480px);
+      flex-shrink: 0;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: clamp(28px, 5vh, 56px) clamp(28px, 4vw, 52px);
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+    .right::-webkit-scrollbar { display: none; }
+
+    .form-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #9ca3af;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    .form-title {
+      font-size: clamp(1.3rem, 3vh, 1.65rem);
+      font-weight: 800;
+      color: #0f172a;
+      letter-spacing: -0.04em;
+      margin-bottom: 5px;
+    }
+
+    .form-sub {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: clamp(16px, 3vh, 28px);
+    }
+
+    /* Flash */
+    .flash { margin-bottom: 14px; }
+
+    .flash-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      margin-bottom: 8px;
+    }
+
+    .flash-item.danger  { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+    .flash-item.success { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .flash-item.warning { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+    .flash-item.info    { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+
+    /* Field */
+    .field { margin-bottom: clamp(10px, 1.8vh, 18px); }
+
+    .field label {
+      display: block;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      color: #111827;
+      font-family: 'Inter', sans-serif;
+      background: #fafafa;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,.1);
+      background: #fff;
+    }
+
+    .field input.err { border-color: #ef4444; }
+
+    .field-hint {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .field-err {
+      font-size: 0.78rem;
+      color: #ef4444;
+      margin-top: 4px;
+    }
+
+    /* Password wrapper */
+    .pw-wrap { position: relative; }
+    .pw-wrap input { padding-right: 42px; }
+
+    .pw-toggle {
+      position: absolute;
+      right: 1px; top: 1px; bottom: 1px;
+      width: 40px;
+      background: transparent;
+      border: none;
+      border-radius: 0 7px 7px 0;
+      cursor: pointer;
+      color: #9ca3af;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem;
+      transition: color .15s;
+    }
+    .pw-toggle:hover { color: #374151; }
+
+    /* Submit */
+    .btn-submit {
+      width: 100%;
+      padding: 11px;
+      background: #0f172a;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: -0.01em;
+      transition: background .15s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: clamp(14px, 2.5vh, 22px);
+      margin-bottom: clamp(14px, 2.5vh, 20px);
+    }
+
+    .btn-submit:hover { background: #1e293b; }
+    .btn-submit:active { transform: scale(.99); }
+
+    .login-row {
+      text-align: center;
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+
+    .login-row a {
+      color: #3b82f6;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .login-row a:hover { text-decoration: underline; }
+
+    /* ================================================================
+       RESPONSIVE
+    ================================================================ */
+    @media (max-width: 960px) {
+      .left { display: none; }
+      .right { width: 100%; }
+    }
+
+    @media (max-height: 680px) {
+      .hero-desc { display: none; }
+    }
+
+    @media (max-height: 560px) {
+      .steps { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- LEFT -->
+  <div class="left">
+
+    <div class="brand">
+      <span class="brand-name">WeScan</span>
+      <span class="brand-pill">v1.0 · edu</span>
     </div>
 
-    <div class="auth-body">
-      <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
-        {{ form.hidden_tag() }}
+    <div class="hero">
 
-        <div class="mb-3">
-          <label class="form-label">{{ form.username.label.text }}</label>
-          {{ form.username(class="form-control" + (" is-invalid" if form.username.errors else ""), placeholder="Choose a username") }}
-          {% for error in form.username.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-          {% endfor %}
-          <div class="form-text">3–64 characters, letters and numbers.</div>
-        </div>
+      <div class="hero-tag">Create your account</div>
 
-        <div class="mb-3">
-          <label class="form-label">{{ form.email.label.text }}</label>
-          {{ form.email(class="form-control" + (" is-invalid" if form.email.errors else ""), placeholder="you@example.com") }}
-          {% for error in form.email.errors %}
-            <div class="invalid-feedback">{{ error }}</div>
-          {% endfor %}
-        </div>
+      <h1 class="hero-title">
+        Start scanning<br><em>in minutes.</em>
+      </h1>
 
-        <div class="mb-3">
-          <label class="form-label">{{ form.password.label.text }}</label>
-          <div class="input-group">
-            {{ form.password(class="form-control" + (" is-invalid" if form.password.errors else ""), id="password", placeholder="••••••••") }}
-            <button class="btn btn-outline-secondary" type="button"
-                    onclick="togglePassword('password', this)"
-                    aria-label="Toggle password visibility" title="Toggle password visibility">
-              <i class="bi bi-eye"></i>
-            </button>
+      <p class="hero-desc">
+        Register a free account to run vulnerability scans, view detailed
+        findings, and download PDF reports — no configuration required.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">01</div>
+          <div class="step-text">
+            <strong>Create your account</strong>
+            <span>Takes less than 30 seconds</span>
           </div>
-          {% for error in form.password.errors %}
-            <div class="text-danger form-error-sm mt-1">{{ error }}</div>
-          {% endfor %}
-          <div class="form-text">At least 8 characters.</div>
         </div>
-
-        <div class="mb-4">
-          <label class="form-label">{{ form.confirm_password.label.text }}</label>
-          <div class="input-group">
-            {{ form.confirm_password(class="form-control" + (" is-invalid" if form.confirm_password.errors else ""), id="confirm_password", placeholder="••••••••") }}
-            <button class="btn btn-outline-secondary" type="button"
-                    onclick="togglePassword('confirm_password', this)"
-                    aria-label="Toggle password visibility" title="Toggle password visibility">
-              <i class="bi bi-eye"></i>
-            </button>
+        <div class="step">
+          <div class="step-num">02</div>
+          <div class="step-text">
+            <strong>Enter a target URL</strong>
+            <span>Any web app you're authorised to test</span>
           </div>
-          {% for error in form.confirm_password.errors %}
-            <div class="text-danger form-error-sm mt-1">{{ error }}</div>
-          {% endfor %}
         </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <div class="step-text">
+            <strong>Run a scan</strong>
+            <span>SQLi, XSS, and header checks in one pass</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">04</div>
+          <div class="step-text">
+            <strong>Download the report</strong>
+            <span>PDF with findings, evidence, and remediation</span>
+          </div>
+        </div>
+      </div>
 
-        <div class="d-grid">
-          {{ form.submit(class="btn btn-primary fw-semibold py-2") }}
-        </div>
-      </form>
     </div>
 
-    <div class="auth-footer">
-      <span class="text-muted">Already have an account?</span>
-      <a href="{{ url_for('auth.login') }}" class="ms-1 fw-semibold text-accent">Sign in</a>
-    </div>
   </div>
-</div>
-{% endblock %}
 
-{% block extra_js %}
-<script>
-function togglePassword(fieldId, btn) {
-  const field = document.getElementById(fieldId);
-  const icon  = btn.querySelector('i');
-  if (field.type === 'password') { field.type = 'text'; icon.className = 'bi bi-eye-slash'; }
-  else { field.type = 'password'; icon.className = 'bi bi-eye'; }
-}
-</script>
-{% endblock %}
+  <!-- RIGHT -->
+  <div class="right">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash">
+        {% for category, message in messages %}
+        <div class="flash-item {{ category }}">
+          <i class="bi bi-{% if category == 'danger' %}exclamation-triangle-fill{% elif category == 'success' %}check-circle-fill{% elif category == 'warning' %}exclamation-circle-fill{% else %}info-circle-fill{% endif %}"></i>
+          <span>{{ message }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <div class="form-eyebrow">New account</div>
+    <div class="form-title">Create account</div>
+    <div class="form-sub">Fill in the details below to get started</div>
+
+    <form method="POST" action="{{ url_for('auth.register') }}" novalidate>
+      {{ form.hidden_tag() }}
+
+      <div class="field">
+        <label for="username">Username</label>
+        {{ form.username(id="username", placeholder="choose_a_username", **{"class": "err" if form.username.errors else ""}) }}
+        {% for e in form.username.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+        <div class="field-hint">3–64 characters, letters and numbers.</div>
+      </div>
+
+      <div class="field">
+        <label for="email">Email</label>
+        {{ form.email(id="email", placeholder="you@example.com", **{"class": "err" if form.email.errors else ""}) }}
+        {% for e in form.email.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+      </div>
+
+      <div class="field">
+        <label for="password">Password</label>
+        <div class="pw-wrap">
+          {{ form.password(id="password", placeholder="••••••••", **{"class": "err" if form.password.errors else ""}) }}
+          <button class="pw-toggle" type="button" onclick="togglePw('password','icon-pw')" aria-label="Toggle password">
+            <i class="bi bi-eye" id="icon-pw"></i>
+          </button>
+        </div>
+        {% for e in form.password.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+        <div class="field-hint">At least 8 characters.</div>
+      </div>
+
+      <div class="field">
+        <label for="confirm_password">Confirm password</label>
+        <div class="pw-wrap">
+          {{ form.confirm_password(id="confirm_password", placeholder="••••••••", **{"class": "err" if form.confirm_password.errors else ""}) }}
+          <button class="pw-toggle" type="button" onclick="togglePw('confirm_password','icon-cpw')" aria-label="Toggle password">
+            <i class="bi bi-eye" id="icon-cpw"></i>
+          </button>
+        </div>
+        {% for e in form.confirm_password.errors %}<div class="field-err">{{ e }}</div>{% endfor %}
+      </div>
+
+      <button type="submit" class="btn-submit">
+        <i class="bi bi-person-plus"></i> Create account
+      </button>
+    </form>
+
+    <div class="login-row">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+    </div>
+
+  </div>
+
+  <script>
+    function togglePw(fieldId, iconId) {
+      const f = document.getElementById(fieldId);
+      const i = document.getElementById(iconId);
+      f.type = f.type === 'password' ? 'text' : 'password';
+      i.className = f.type === 'password' ? 'bi bi-eye' : 'bi bi-eye-slash';
+    }
+  </script>
+</body>
+</html>

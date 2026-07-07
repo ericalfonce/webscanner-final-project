@@ -452,6 +452,20 @@
     }
     .reg-link a:hover { text-decoration: underline; }
 
+    /* Register row below form */
+    .reg-row {
+      margin-top: clamp(14px, 2.5vh, 22px);
+      text-align: center;
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+    .reg-row a {
+      color: #3b82f6;
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .reg-row a:hover { text-decoration: underline; }
+
     /* Right footer */
     .right-foot {
       margin-top: clamp(16px, 3vh, 28px);
@@ -605,6 +619,10 @@
         <i class="bi bi-box-arrow-in-right"></i> Sign in to WeScan
       </button>
     </form>
+
+    <div class="reg-row">
+      Don't have an account? <a href="{{ url_for('auth.register') }}">Create one free</a>
+    </div>
 
   </div>
 
