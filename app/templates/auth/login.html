@@ -26,9 +26,14 @@
       --blue-glow: rgba(59,130,246,.25);
     }
 
+    html, body {
+      height: 100%;
+      overflow: hidden;
+    }
+
     body {
       font-family: 'Inter', system-ui, sans-serif;
-      min-height: 100vh;
+      height: 100vh;
       display: flex;
       background: var(--dark);
       -webkit-font-smoothing: antialiased;
@@ -469,7 +474,6 @@
   <div class="left">
 
     <div class="brand">
-      <div class="brand-icon"><i class="bi bi-shield-lock-fill"></i></div>
       <span class="brand-name">WeScan</span>
       <span class="brand-pill">v1.0 · edu</span>
     </div>
