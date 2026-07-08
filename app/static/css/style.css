@@ -5,9 +5,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --blue:        #2563eb;
-  --blue-soft:   #eff6ff;
-  --blue-dark:   #1d4ed8;
+  --blue:        #0f172a;
+  --blue-soft:   #f1f5f9;
+  --blue-dark:   #0b0e17;
   --red:         #dc2626;
   --red-soft:    #fef2f2;
   --orange:      #ea580c;
@@ -67,25 +67,12 @@ main { flex: 1; }
   letter-spacing: -0.01em;
 }
 
-.brand-icon {
-  width: 30px;
-  height: 30px;
-  background: var(--blue);
-  border-radius: 7px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 0.85rem;
-  flex-shrink: 0;
-}
-
 .brand-tag {
   font-size: 0.6rem;
   font-weight: 600;
   background: var(--blue-soft);
   color: var(--blue);
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--gray-200);
   border-radius: 4px;
   padding: 1px 5px;
   letter-spacing: 0.04em;
@@ -291,8 +278,8 @@ main { flex: 1; }
 }
 
 .form-control:focus, .form-select:focus {
-  border-color: #93c5fd;
-  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+  border-color: var(--gray-400);
+  box-shadow: 0 0 0 3px rgba(15,23,42,.10);
   outline: none;
 }
 
@@ -328,7 +315,7 @@ main { flex: 1; }
 }
 
 .scan-type-card:hover {
-  border-color: #93c5fd !important;
+  border-color: var(--gray-400) !important;
   background: var(--blue-soft);
 }
 
@@ -336,7 +323,7 @@ main { flex: 1; }
 .scan-type-card:has(input:checked) {
   border-color: var(--blue) !important;
   background: var(--blue-soft);
-  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+  box-shadow: 0 0 0 3px rgba(15,23,42,.08);
 }
 
 .module-card {
@@ -347,8 +334,8 @@ main { flex: 1; }
 }
 
 .module-card:hover {
-  border-color: #93c5fd !important;
-  box-shadow: 0 0 0 3px rgba(37,99,235,.08);
+  border-color: var(--gray-400) !important;
+  box-shadow: 0 0 0 3px rgba(15,23,42,.06);
 }
 
 /* ---- Badges ---- */
@@ -362,7 +349,7 @@ main { flex: 1; }
 .badge.bg-success { background: var(--green) !important; }
 .badge.bg-danger  { background: var(--red) !important; }
 .badge.bg-warning { background: #fef9c3 !important; color: var(--yellow) !important; border: 1px solid #fde68a; }
-.badge.bg-info    { background: #e0f2fe !important; color: var(--blue) !important; border: 1px solid #bae6fd; }
+.badge.bg-info    { background: var(--blue-soft) !important; color: var(--blue) !important; border: 1px solid var(--gray-200); }
 .badge.bg-secondary { background: var(--gray-100) !important; color: var(--gray-700) !important; border: 1px solid var(--gray-200); }
 .badge.bg-dark    { background: var(--gray-900) !important; }
 .badge.bg-orange  { background: var(--orange-soft) !important; color: var(--orange) !important; border: 1px solid #fed7aa; }
@@ -430,7 +417,7 @@ main { flex: 1; }
 .sev-pill.high   { background: var(--red-soft); color: var(--red); border: 1px solid #fca5a5; }
 .sev-pill.medium { background: var(--orange-soft); color: var(--orange); border: 1px solid #fed7aa; }
 .sev-pill.low    { background: var(--yellow-soft); color: var(--yellow); border: 1px solid #fde68a; }
-.sev-pill.info   { background: var(--blue-soft); color: var(--blue); border: 1px solid #bfdbfe; }
+.sev-pill.info   { background: var(--blue-soft); color: var(--blue); border: 1px solid var(--gray-200); }
 
 /* ---- Detail items ---- */
 .detail-label {
@@ -756,7 +743,7 @@ pre.edu-code.good { border-top: 2px solid var(--green); border-radius: 0 6px 6px
 /* ---- Tip card ---- */
 .tip-card {
   background: var(--blue-soft);
-  border: 1px solid #bfdbfe;
+  border: 1px solid var(--gray-200);
   border-radius: var(--radius);
   padding: 16px 20px;
 }
