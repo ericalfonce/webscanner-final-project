@@ -8,7 +8,7 @@
     <div class="page-header d-flex align-items-start justify-content-between gap-3">
       <div>
         <h1 class="page-title">Scan Progress</h1>
-        <p class="page-sub"><i class="bi bi-globe me-1"></i>{{ scan.target_url }}</p>
+        <p class="page-sub">{{ scan.target_url }}</p>
       </div>
       <span class="badge fs-6
         {% if scan.status == 'completed' %}bg-success
@@ -72,7 +72,6 @@
     <!-- Live Log -->
     <div class="card border-0 mb-4">
       <div class="card-header d-flex align-items-center">
-        <i class="bi bi-terminal me-2 text-muted"></i>
         <span class="fw-semibold">Live Log</span>
         <div class="spinner-border spinner-border-sm ms-auto text-accent" id="spinner"
              {% if scan.status not in ('running', 'pending') %}style="display:none"{% endif %}></div>
@@ -86,15 +85,11 @@
     <div class="d-flex gap-2" id="actionButtons">
       {% if scan.status == 'completed' %}
       <a href="{{ url_for('scanner.scan_results', scan_id=scan.id) }}" class="btn btn-primary fw-semibold">
-        <i class="bi bi-file-earmark-text me-2"></i>View Report
+        View Report
       </a>
       {% endif %}
-      <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-plus-circle me-1"></i>New Scan
-      </a>
-      <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
-        <i class="bi bi-house me-1"></i>Dashboard
-      </a>
+      <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-outline-secondary">New Scan</a>
+      <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Dashboard</a>
     </div>
 
   </div>

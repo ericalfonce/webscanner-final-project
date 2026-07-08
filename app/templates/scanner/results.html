@@ -7,7 +7,7 @@
 <div class="page-header d-flex align-items-start justify-content-between flex-wrap gap-3">
   <div>
     <h1 class="page-title">Scan Report</h1>
-    <p class="page-sub"><i class="bi bi-globe me-1"></i>{{ scan.target_url }}</p>
+    <p class="page-sub">{{ scan.target_url }}</p>
     <p class="text-muted tip-text mb-0">
       {{ generated_at }} &nbsp;·&nbsp;
       {% if scan.duration_seconds %}{{ scan.duration_seconds }}s{% else %}—{% endif %} duration &nbsp;·&nbsp;
@@ -16,10 +16,10 @@
   </div>
   <div class="d-flex gap-2 flex-wrap">
     <a href="{{ url_for('scanner.download_pdf', scan_id=scan.id) }}" class="btn btn-outline-danger">
-      <i class="bi bi-file-pdf me-1"></i>Download PDF
+      Download PDF
     </a>
     <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary">
-      <i class="bi bi-play-circle me-1"></i>New Scan
+      New Scan
     </a>
   </div>
 </div>
@@ -103,22 +103,22 @@
   <div class="card-body">
     <div class="row g-3 mb-3">
       <div class="col-sm-6">
-        <div class="detail-label"><i class="bi bi-globe me-1"></i>Affected URL</div>
+        <div class="detail-label">Affected URL</div>
         <div><code>{{ finding.affected_url or '—' }}</code></div>
       </div>
       <div class="col-sm-6">
-        <div class="detail-label"><i class="bi bi-tag me-1"></i>Parameter / Header</div>
+        <div class="detail-label">Parameter / Header</div>
         <div><code>{{ finding.affected_parameter or '—' }}</code></div>
       </div>
       {% if finding.payload_used %}
       <div class="col-12">
-        <div class="detail-label"><i class="bi bi-code me-1"></i>Payload Used</div>
+        <div class="detail-label">Payload Used</div>
         <div><code class="text-danger">{{ finding.payload_used }}</code></div>
       </div>
       {% endif %}
       {% if finding.evidence %}
       <div class="col-12">
-        <div class="detail-label"><i class="bi bi-journal-text me-1"></i>Evidence</div>
+        <div class="detail-label">Evidence</div>
         <pre class="evidence-box text-wrap">{{ finding.evidence }}</pre>
       </div>
       {% endif %}
@@ -126,14 +126,14 @@
 
     {% if finding.description %}
     <div class="mb-3">
-      <div class="detail-label"><i class="bi bi-info-circle me-1"></i>Description</div>
+      <div class="detail-label">Description</div>
       <p class="mb-0">{{ finding.description }}</p>
     </div>
     {% endif %}
 
     {% if finding.remediation %}
     <div class="alert alert-success mb-3">
-      <div class="fw-semibold mb-1"><i class="bi bi-wrench me-1"></i>How to Fix</div>
+      <div class="fw-semibold mb-1">How to Fix</div>
       <p class="mb-0 tip-text">{{ finding.remediation }}</p>
     </div>
     {% endif %}
@@ -144,7 +144,7 @@
               onclick="toggleEdu('{{ finding.id }}')"
               id="eduToggle_{{ finding.id }}"
               aria-expanded="false">
-        <i class="bi bi-book-half me-2"></i>Learn More About This Vulnerability
+        Learn More About This Vulnerability
         <i class="bi bi-chevron-down ms-auto edu-chevron"></i>
       </button>
 
@@ -174,10 +174,10 @@
         <div class="edu-pane active" id="pane_{{ finding.id }}_what">
           <p class="edu-text pre-line">{{ finding.edu.what }}</p>
           {% if finding.edu.cvss %}
-          <div class="edu-meta"><i class="bi bi-speedometer2 me-1"></i><strong>CVSS:</strong> {{ finding.edu.cvss }}</div>
+          <div class="edu-meta"><strong>CVSS:</strong> {{ finding.edu.cvss }}</div>
           {% endif %}
           {% if finding.edu.owasp %}
-          <div class="edu-meta"><i class="bi bi-box-arrow-up-right me-1"></i>
+          <div class="edu-meta">
             <a href="{{ finding.edu.owasp }}" target="_blank" rel="noopener noreferrer">OWASP Reference →</a>
           </div>
           {% endif %}
@@ -231,12 +231,8 @@
 
 <!-- Back links -->
 <div class="d-flex gap-2 mt-2">
-  <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">
-    <i class="bi bi-house me-1"></i>Dashboard
-  </a>
-  <a href="{{ url_for('scanner.scan_history') }}" class="btn btn-outline-secondary">
-    <i class="bi bi-clock-history me-1"></i>History
-  </a>
+  <a href="{{ url_for('dashboard.index') }}" class="btn btn-outline-secondary">Dashboard</a>
+  <a href="{{ url_for('scanner.scan_history') }}" class="btn btn-outline-secondary">History</a>
 </div>
 
 {% endblock %}

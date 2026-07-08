@@ -8,7 +8,7 @@
     <p class="page-sub">All vulnerability scans run by your account.</p>
   </div>
   <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary fw-semibold">
-    <i class="bi bi-play-circle me-2"></i>New Scan
+    New Scan
   </a>
 </div>
 
@@ -61,7 +61,7 @@
                 {% if scan.high_count > 0 %}<span class="badge bg-danger me-1">{{ scan.high_count }} H</span>{% endif %}
                 {% if scan.medium_count > 0 %}<span class="badge bg-orange me-1">{{ scan.medium_count }} M</span>{% endif %}
                 {% if scan.low_count > 0 %}<span class="badge bg-warning me-1">{{ scan.low_count }} L</span>{% endif %}
-                {% if scan.total_findings == 0 %}<span class="text-green tip-text"><i class="bi bi-check-circle me-1"></i>Clean</span>{% endif %}
+                {% if scan.total_findings == 0 %}<span class="text-green tip-text">Clean</span>{% endif %}
               {% else %}
                 <span class="text-muted">—</span>
               {% endif %}
@@ -109,7 +109,7 @@
       <h6 class="fw-semibold mb-1">No scan history</h6>
       <p class="text-muted mb-3">Your completed scans will appear here.</p>
       <a href="{{ url_for('scanner.new_scan') }}" class="btn btn-primary btn-sm">
-        <i class="bi bi-play-circle me-2"></i>Run first scan
+        Run first scan
       </a>
     </div>
     {% endif %}
